@@ -15,8 +15,8 @@ public class DataTest {
             //File file = new File("4. Historico Cartera COMERCIAL por OF.xlsx");
             //File newDir = new File("procesedDocuments");
 
-            String file1 =System.getProperty("user.dir") + "\\documents\\initialDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
-            String file2 =System.getProperty("user.dir") + "\\documents\\finalDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
+            String file1 = System.getProperty("user.dir") + "\\documents\\initialDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
+            String file2 = System.getProperty("user.dir") + "\\documents\\finalDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
 
             String test1 = "4. Historico Cartera COMERCIAL por OF.xlsx";
             String test2 = "4. Historico Cartera COMERCIAL por OF.xlsx";
@@ -39,7 +39,7 @@ public class DataTest {
 
             WorksheetCollection collection = wb.getWorksheets();
 
-            for (int worksheetIndex = 0 ; worksheetIndex < collection.getCount(); worksheetIndex++){
+            for (int worksheetIndex = 0 ; worksheetIndex <= collection.getCount(); worksheetIndex++){
                 Worksheet worksheet = collection.get(worksheetIndex);
 
                 System.out.println("Worksheet: " + worksheet.getName());
@@ -51,7 +51,23 @@ public class DataTest {
 
                     for (int j = 0; j < cols; j++) {
                         if (worksheet.getCells().get(i, j).getValue() != null) {
-                            System.out.println(worksheet.getCells().get(176, 3).toString()/*getDisplayStringValue().getValue()*/ + "||");
+                            if (worksheet.getCells().get(i, j).getDisplayStringValue().contains("Ciudad")) {
+                                System.out.println(worksheet.getCells().get(i, j).getDisplayStringValue() + "------");
+
+                            }
+                            System.out.println(worksheet.getCells().get(i, j).getDisplayStringValue().contains("Ciudad") + "------");
+                            /*
+                            * getDoubleValue
+                            * getFloatValue
+                            * getIntVale
+                            * getNumberCategoryType
+                            * getArrayRange -> Rango de celdas
+                            *
+                            *
+                            * */
+                            System.out.print(worksheet.getCells().get(168, 0).getDisplayStringValue()/*getDisplayStringValue()/*.getValue()*/ + " | ");
+                            System.out.print(worksheet.getCells().get(176, 4).getDisplayStringValue()/*getDisplayStringValue()/*.getValue()*/ + " | ");
+
                             break;
                         }
                     }
