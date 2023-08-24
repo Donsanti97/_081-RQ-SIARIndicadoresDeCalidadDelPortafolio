@@ -1,9 +1,13 @@
 package dataTest;
 
 import com.aspose.cells.*;
+import manejador_Accion.ManejadorDataFile;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 public class DataTest {
 
 
@@ -15,7 +19,7 @@ public class DataTest {
             //File file = new File("4. Historico Cartera COMERCIAL por OF.xlsx");
             //File newDir = new File("procesedDocuments");
 
-            String file1 = System.getProperty("user.dir") + "\\documents\\initialDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
+            String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\Historico Cartera Comercial (3).xlsx";
             String file2 = System.getProperty("user.dir") + "\\documents\\finalDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
 
             String test1 = "4. Historico Cartera COMERCIAL por OF.xlsx";
@@ -35,50 +39,62 @@ public class DataTest {
 
 
             System.out.println("------------------------------------------------------------------------------");
-            Workbook wb = new Workbook(file1);
 
-            WorksheetCollection collection = wb.getWorksheets();
+            //Generando archivos excel a trabajar
+            Workbook workbook1 = new Workbook(file1);
+            Workbook workbook2 = new Workbook(file2);
 
-            for (int worksheetIndex = 0 ; worksheetIndex <= collection.getCount(); worksheetIndex++){
-                Worksheet worksheet = collection.get(worksheetIndex);
+            int maxWorksheets = workbook1.getWorksheets().getCount();
 
-                System.out.println("Worksheet: " + worksheet.getName());
+            //Generando index para identificar todas las hojas dentro de los archivos
+            for (int worksheetIndex = 0; worksheetIndex < maxWorksheets; worksheetIndex++) {
 
-                int rows = worksheet.getCells().getMaxDataRow();
-                int cols = worksheet.getCells().getMaxDataColumn();
 
-                for (int i = 0; i < rows; i++) {
+                Worksheet worksheet1 = workbook1.getWorksheets().get(worksheetIndex);
+                Worksheet worksheet2 = workbook2.getWorksheets().get(worksheetIndex);
+                System.out.println("WorkSheet1: " + worksheet1.getName());
+                System.out.println("Worksheet2: " + worksheet2.getName());
 
-                    for (int j = 0; j < cols; j++) {
-                        if (worksheet.getCells().get(i, j).getValue() != null) {
-                            if (worksheet.getCells().get(i, j).getDisplayStringValue().contains("Ciudad")) {
-                                System.out.println(worksheet.getCells().get(i, j).getDisplayStringValue() + "------");
+                Cells cells1 = worksheet1.getCells();
+                Cells cells2 = worksheet2.getCells();
 
+                int maxRows = Math.max(cells1.getMaxDataRow(), cells2.getMaxDataRow());
+                int maxCols = Math.max(cells1.getMaxDataColumn(), cells2.getMaxDataColumn());
+
+                //Comparando si los nombres de las hojas de trabajo existen para comenzar el análisis de los campos
+                if (worksheet1.getName().equals(worksheet2.getName()))
+
+                for (int row = 0; row <= maxRows; row++) {
+                    for (int col = 0; col <= maxCols; col++) {
+                        Cell cell1 = cells1.get(row, col);
+                        Cell cell2 = cells2.get(row, col);
+                    /*if (cell1.equals(null) && cell2.equals(null)){
+                        //cell1 = cell1.setValue("");putValue("0");
+                    }*/
+
+                        if (cell1 != null && cell2 != null) {
+                            //if (cell1.getStyle().isDateTime() && cell2.getStyle().isDateTime())
+                            if (cell1.getType() == CellValueType.IS_STRING && cell2.getType() == CellValueType.IS_STRING) {
+                                String value1 = cell1.getStringValue();
+                                String value2 = cell2.getStringValue();
+                                if (!value1.equals(value2)) {
+                                    System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1));
+                                }
+                            } else if (cell1.getType() == CellValueType.IS_NUMERIC && cell2.getType() == CellValueType.IS_NUMERIC) {
+                                double value1 = cell1.getDoubleValue();
+                                double value2 = cell2.getDoubleValue();
+                                if (value1 != value2) {
+                                    System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1));
+                                }
                             }
-                            System.out.println(worksheet.getCells().get(i, j).getDisplayStringValue().contains("Ciudad") + "------");
-                            /*
-                            * getDoubleValue
-                            * getFloatValue
-                            * getIntVale
-                            * getNumberCategoryType
-                            * getArrayRange -> Rango de celdas
-                            *
-                            *
-                            * */
-                            System.out.print(worksheet.getCells().get(168, 0).getDisplayStringValue()/*getDisplayStringValue()/*.getValue()*/ + " | ");
-                            System.out.print(worksheet.getCells().get(176, 4).getDisplayStringValue()/*getDisplayStringValue()/*.getValue()*/ + " | ");
 
-                            break;
                         }
+
+                        System.out.print("Cell1: " + cell1.getValue()/*getDisplayStringValue()*/ + " | ");
+                        //System.out.print("Cell2: " + cell2.getDisplayStringValue() + "|\n");
                     }
-                    System.out.println(" ");
                 }
             }
-
-
-
-
-
 
         } catch (Exception e) {
             throw new RuntimeException(e);

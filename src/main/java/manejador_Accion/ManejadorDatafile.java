@@ -1,5 +1,9 @@
 package manejador_Accion;
 
+import com.aspose.cells.Row;
+import com.aspose.cells.Workbook;
+import com.aspose.cells.Worksheet;
+import com.aspose.cells.WorksheetCollection;
 import com.google.common.base.Splitter;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -47,7 +51,7 @@ public class ManejadorDataFile {
      * @author Mairon Martinez
      * @since 31/07/2023
      */
-    public Map<String, Map<String, String>> datosExcel(String ruta, String nombreHojaExcel) {
+    /*public Map<String, Map<String, String>> datosExcel(String ruta, String nombreHojaExcel) {
 
         Map <String, Map<String, String>> datosExcel = new HashMap();
         Map <String, String> funciones = new HashMap();
@@ -80,6 +84,44 @@ public class ManejadorDataFile {
             getLoger("Error metodo datosExcel" + e);
             return datosExcel;
         }
+    }*/
+
+    public Map<String, Map<String, String>> datosExcell(String ruta, String nombreHojaExcel) {
+
+        Map <String, Map<String, String>> datosExcel = new HashMap();
+        Map <String, String> codSucursal = new HashMap();
+
+        try{
+
+            Workbook workbook = new Workbook(ruta);
+            WorksheetCollection collection = workbook.getWorksheets();
+            Worksheet worksheet = collection.get(nombreHojaExcel);
+                System.out.println("WorkSheet: " + worksheet.getName());
+
+                int rows = worksheet.getCells().getMaxDataRow();
+                int cols = worksheet.getCells().getMaxDataColumn();
+
+                List<String> titles = titulosExcel(worksheet);
+
+                for (int i = 0; i <= rows; i++) {
+                    Row row = worksheet.getCells().checkRow(i);
+
+                    for (int j = 0; j < row.getIndex(); j++) {
+                        codSucursal.put(titles.get(j), row.get(j).getDisplayStringValue());
+                    }
+                    datosExcel.put(codSucursal.get("Cod"), convertWithGuava(codSucursal.toString().replace(", ", ",").replace("{", "").replace("}", "")));
+                    codSucursal.clear();
+                }
+
+
+            return datosExcel;
+        }
+        catch (IOException e){
+            getLoger("Error metodo datosExcel" + e);
+            return datosExcel;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -89,7 +131,7 @@ public class ManejadorDataFile {
      * @author Mairon Martinez
      * @since 31/07/023
      */
-    public List<Map<String, String>> consultaDatosExcel(String ruta, String nombreHojaExcel) {
+    /*public List<Map<String, String>> consultaDatosExcel(String ruta, String nombreHojaExcel) {
 
         ArrayList<Map<String, String>> result = new ArrayList();
         Map<String, String> consultaDatosExcel = new HashMap();
@@ -121,7 +163,7 @@ public class ManejadorDataFile {
             getLoger("Error en método consultaDatosExcel" + e);
             return result;
         }
-    }
+    }*/
 
     /** Método. Retorna una lista con los ebcabezados de un excel
      * @param
@@ -129,12 +171,23 @@ public class ManejadorDataFile {
      * @author Mairon Martinez
      * @since 31/07/023
      */
-    public static List<String> titulosExcel(XSSFSheet hojaExcel){
+    /*public static List<String> titulosExcel(XSSFSheet hojaExcel){
         List<String> titulos = new ArrayList<>();
         for(int i = 0; i<1; i++){
             XSSFRow row = hojaExcel.getRow(i);
             for(int j = 0; j< row.getLastCellNum(); j++) {
                 titulos.add(row.getCell(j).getStringCellValue());
+            }
+        }
+        return titulos;
+    }*/
+
+    public static List<String> titulosExcel(Worksheet hojaExcel){
+        List<String> titulos = new ArrayList<>();
+        for(int i = 0; i<1; i++){
+            Row row = hojaExcel.getCells().checkRow(i);
+            for(int j = 0; j< row.getIndex(); j++) {
+                titulos.add(row.get(j).getDisplayStringValue());
             }
         }
         return titulos;

@@ -7,17 +7,22 @@ import java.util.*;
 public class Test {
     public static void main(String[] args) {
         Object[][] array1 = {{ "manzana", 5, "banana", 3, "pera", 10 },
-                {"some", 3, "somelse", "any", "anyelse"},
-                {"la Banana", "la banana al cuadrado", "la manzana"}};
+                {"some", 3, "somelse", "any", "anyelse", null},
+                {"la Banana", "la banana al cuadrado", "la manzana", null, null, null}};
         Object[][] array2 = {{ 5, "banana", "pera", "manzana", 10, 3 },
                 {"la manzana", "la Banana", "la banana al cuadrado"},
                 {"somelse", "any", "some", 3, "anyelse"}
                 };
 
+
         System.out.println(Arrays.deepToString(array1));
 
         int rows = array1.length;
         System.out.println(rows);
+
+        for (Object[] objects : array1) {
+            System.out.println(Arrays.toString(objects));
+        }
 
         shuffleArray(array1);
         shuffleArray(array2);
@@ -35,6 +40,16 @@ public class Test {
         Collections.sort(list2, new MixedComparators());
         System.out.println(list1 + "-->List 1 after");
         System.out.println(list2 + "-->list 2 afyer");
+
+
+        for (int i = 0; i < array1.length; i++) {
+            for (int j = 0; j < array1[i].length; j++) {
+                array1 = list1.toArray(new Object[0][1]);
+                System.out.println(Arrays.deepToString(array1));
+            }
+
+        }
+
 
 
         System.out.println("----------------------------------------------------------------------------------------------");

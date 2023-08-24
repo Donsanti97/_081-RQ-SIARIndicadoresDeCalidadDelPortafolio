@@ -1,9 +1,6 @@
 package dataTest;
 
-import com.aspose.cells.Row;
-import com.aspose.cells.Workbook;
-import com.aspose.cells.Worksheet;
-import com.aspose.cells.WorksheetCollection;
+import com.aspose.cells.*;
 import com.google.common.base.Splitter;
 import manejador_Accion.ManejadorDataFile;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -86,10 +83,59 @@ public class EjercicioDeEncabezados {
 
     }
 
+    @Test(description = "Validar titulos")
+    public static void validaTitulos(){
+        try {
+            String ruta = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
+            Map<String, String> datosExcel = new HashMap<>();
+            Map<Cell, Cell> datosExcel1 = new HashMap<>();
+            Workbook wb = new Workbook(ruta);
+            WorksheetCollection collection = wb.getWorksheets();;
+            Worksheet ws = collection.get("CER150");
+            int rows = ws.getCells().getMaxDataRow();
+            int cols = ws.getCells().getMaxDataColumn();
+            for (int i = 0; i <= cols; i++) {
+
+                Row row = ws.getCells().checkRow(i);
+                String encabezados = ws.getCells().get(i).getDisplayStringValue();
+                System.out.println("Encabezados: " + ws.getCells().get(i).getDisplayStringValue() + "|");
+                System.out.println("Row: " + row.get(i).getDisplayStringValue());
+                String valores = "";
+                Cell cell1 = ws.getCells().get(i);
+                System.out.println("Cell1: " + cell1.getValue());
+
+
+                for (int j = 0; j < rows; j++) {
+                    Cell cell = ws.getCells().get(i+1, j);
+                    valores = ws.getCells().checkRow(j+1).get(i).getDisplayStringValue();
+                    System.out.println("Cell: " + cell.getValue());
+                    if (valores.isEmpty()) {
+                        valores = "0";
+                    }
+                    if (cell.toString().isEmpty()){
+                        cell.putValue("0");
+                    }
+                    //System.out.println("Valores: " + valores);
+                    //datosExcel.put();
+                    //System.out.println("Datos Excel: " + datosExcel.put(encabezados, valores));
+                    //System.out.println("Datos Excel-e: " + datosExcel.get(encabezados));
+                    datosExcel1.put(cell1, cell);
+                    System.out.println("DatosExcel 1: " + datosExcel1.get(cell1).getValue());
+                }
+
+            }
+            System.out.println(datosExcel);
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void mapeito(){}
+
     @Test(description = "Matriz")
     public static void imprimirDatos() {
-        //String ruta = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\Historico Cartera Comercial (3).xlsx";
-        //String nombreHojaExcel = "CER 150";
         try {
 
             int rows = 10;
