@@ -20,6 +20,49 @@ import java.util.logging.Logger;
 public class EjercicioDeEncabezados {
 
 
+
+    @Test
+    public static void test() throws Exception {
+        String filePath1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
+        String filePath2 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData - copia.xlsx";
+
+        Workbook workbook1 = new Workbook(filePath1);
+        Workbook workbook2 = new Workbook(filePath2);
+
+        Set<String> sheetNames1 = new HashSet<>();
+        Set<String> duplicateSheetNames = new HashSet<>();
+
+        for (int sheetIndex = 0; sheetIndex < workbook1.getWorksheets().getCount(); sheetIndex++) {
+            String name = workbook1.getWorksheets().get(sheetIndex).getName();
+            String newName = name.replaceAll("\\s", "");
+
+            if (sheetNames1.contains(newName)) {
+                duplicateSheetNames.add(newName);
+            } else {
+                sheetNames1.add(newName);
+            }
+        }
+
+        for (int sheetIndex = 0; sheetIndex < workbook2.getWorksheets().getCount(); sheetIndex++) {
+            String name = workbook2.getWorksheets().get(sheetIndex).getName();
+            String newName = name.replaceAll("\\s", "");
+
+            if (sheetNames1.contains(newName)) {
+                duplicateSheetNames.add(newName);
+            }
+        }
+
+        if (!duplicateSheetNames.isEmpty()) {
+            System.out.println("Las siguientes hojas tienen el mismo nombre en ambos archivos:");
+            for (String name : duplicateSheetNames) {
+                System.out.println(name);
+            }
+        } else {
+            System.out.println("No se encontraron hojas con el mismo nombre en ambos archivos.");
+        }
+    }
+
+
     @Test(description = "Validar lectura de archivo por filas")
     public static void lectura(){
         try{
