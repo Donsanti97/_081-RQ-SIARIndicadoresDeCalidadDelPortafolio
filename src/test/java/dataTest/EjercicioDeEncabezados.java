@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,62 +64,142 @@ public class EjercicioDeEncabezados {
     }
 
 
+    public static Set<String> getHeaders(Worksheet worksheet, int headerRow) {
+        Set<String> headers = new HashSet<>();
+        Row row = worksheet.getCells().getRows().get(headerRow);
+
+        for (int col = 0; col <= row.getLastCell().getColumn(); col++) {
+            Cell cell = row.get(col);
+                headers.add(cell.getStringValue());
+        }
+
+        return headers;
+    }
+    public static int findHeaderRow(Worksheet worksheet, Set<String> targetHeaders) {
+        for (int row = 0; row < worksheet.getCells().getMaxDataRow() + 1; row++) {
+            Set<String> headers = getHeaders(worksheet, row);
+
+            if (headers.equals(targetHeaders)) {
+                return row;
+            }
+        }
+
+        throw new IllegalArgumentException("No se encontraron encabezados coincidentes en la hoja.");
+    }
+
     @Test(description = "Validar lectura de archivo por filas")
-    public static void lectura(){
+    public static void encabezados(){
         try{
             String rutaA = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\Historico Cartera Comercial (3).xlsx";
             String rutaB = System.getProperty("user.dir") + "\\documents\\finalDocument\\4. Historico Cartera COMERCIAL por OF.xlsx";
 
             Workbook workbookA = new Workbook(rutaA);
+            Workbook workbookB = new Workbook(rutaB);
             WorksheetCollection collectionA = workbookA.getWorksheets();
             int worksheetIndex = 0;
-            Worksheet worksheetA = collectionA.get(worksheetIndex);
+            //Worksheet worksheetA = collectionA.get(worksheetIndex);
+            Worksheet worksheetA = workbookA.getWorksheets().get(worksheetIndex);
+            Worksheet worksheetB = workbookB.getWorksheets().get(3);
+            Set<String> headers1 = new HashSet<>(getHeaders(worksheetA, 0));
+            String s = headers1.toString();
+            String se = "";
+                    se = s.replaceAll("/", "-");
+
+            Set<String> headers2 = new HashSet<>(getHeaders(worksheetB, 168/*findHeaderRow(worksheetB, headers1)*/));
+            String se1 = headers2.toString();
+            switch (se1){
+                case "ene":
+                    se1 = s.replaceAll("ene", "01");
+                    break;
+                case "feb":
+                    se1 = s.replaceAll("feb", "02");
+                    break;
+                case "mar":
+                    se1 = s.replaceAll("mar", "03");
+                    break;
+                case "abr":
+                    se1 = s.replaceAll("abr", "04");
+                    break;
+                case "may":
+                    se1 = s.replaceAll("may", "05");
+                    break;
+                case "jun":
+                    se1 = s.replaceAll("jun", "06");
+                    break;
+                case "jul":
+                    se1 = s.replaceAll("jul", "07");
+                    break;
+                case "ago":
+                    se1 = s.replaceAll("ago", "08");
+                    break;
+                case "sep":
+                    se1 = s.replaceAll("sep", "09");
+                    break;
+                case "oct":
+                    se1 = s.replaceAll("oct", "10");
+                    break;
+                case "nov":
+                    se1 = s.replaceAll("nov", "11");
+                    break;
+                case "dic":
+                    se1 = s.replaceAll("dic", "12");
+                    break;
+            }
+            System.out.println("Encabezados 1: " + headers1);
+            System.out.println(se1);
+            System.out.println("Encabezados 2; " + headers2);
+
+            //Set<String> commonHeaders = new HashSet<>(headers1);
+            //commonHeaders.retainAll(headers2);
+
+            /*if (!commonHeaders.isEmpty()) {
+                System.out.println("Los siguientes encabezados se1 encuentran en ambas hojas:");
+                for (String header : commonHeaders) {
+                    System.out.println(header);
+                }
+            } else {
+                System.out.println("No se1 encontraron encabezados comunes en ambas hojas.");
+            }*/
+
+            System.out.println("------------------------------------------------------------------------------");
 
             int rowsA = worksheetA.getCells().getMaxDataRow();
             int colsA = worksheetA.getCells().getMaxDataColumn();
 
-            for (int i = 0; i <= rowsA; i++) {
-                for (int j = 0; j <= colsA; j++) {
+            String encabezados = "";
+            String valores = "";
 
-                    String sheetNameA = worksheetA.getName().replace(" ", "");
-                    boolean contain = worksheetA.getName().startsWith("ee");
-                    System.out.println("Worksheet: " + worksheetA.getName());
-                    List<String> list = Arrays.asList(worksheetA.getCells().get(i, j).getDisplayStringValue());
+            List<String> array = Collections.singletonList("");
+            Cells cells = worksheetA.getCells();
 
-                    for (int k = 0; k < list.size(); k++) {
-
-                        Workbook workbookB = new Workbook(rutaB);
-                        WorksheetCollection collectionB = workbookA.getWorksheets();
-                        for (int worksheetIndex1 = 0; worksheetIndex1 < collectionB.getCount(); worksheetIndex1++) {
-                            Worksheet worksheetB = collectionA.get(worksheetIndex1);
-
-                            int rowsB = worksheetB.getCells().getMaxDataRow();
-                            int colsB = worksheetB.getCells().getMaxDataColumn();
-
-                            String sheetNameB = worksheetB.getName().replace(" ", "");
+            Map<String, String> datos = new HashMap<>();
 
 
-
-
-                            if (sheetNameA.equals(sheetNameB)){
-                                for (int l = 0; l < rowsB; l++) {
-                                    for (int m = 0; m < colsB; m++) {
-                                        ArrayList<String> listB = (ArrayList<String>) Arrays.asList(worksheetB.getCells().get(l, m).getDisplayStringValue());
-                                    }
-                                }
-                            }
-                        }
-
-
-
-
-                    }
+            for (int i = 0; i < rowsA; i++) {
+                for (int j = 0; j < colsA; j++) {
+                    //encabezados = cells.get(0, j).getStringValue();
+                    //System.out.print(encabezados + "||");
 
                 }
+                break;
+                //encabezados = cells.get(i).getStringValue(); worksheetA.getCells().get(i).getStringValue();
             }
 
-            List<String> filas = Arrays.asList("");
 
+            for (int i = 0; i < rowsA; i++) {
+                for (int j = 0; j < colsA; j++) {
+                    valores = worksheetA.getCells().get(i+1, j).getDisplayStringValue();
+                    //System.out.println("Valores: " + valores);
+                    if (valores.isEmpty()){
+                        valores = "0";
+                    }
+                    datos.put(encabezados, valores);
+                    System.out.print(datos.get(encabezados) + "||");
+                }
+                System.out.println();
+
+
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -141,29 +222,29 @@ public class EjercicioDeEncabezados {
 
                 Row row = ws.getCells().checkRow(i);
                 String encabezados = ws.getCells().get(i).getDisplayStringValue();
-                System.out.println("Encabezados: " + ws.getCells().get(i).getDisplayStringValue() + "|");
-                System.out.println("Row: " + row.get(i).getDisplayStringValue());
+                System.out.println("Encabezados: " + encabezados/*ws.getCells().get(i).getDisplayStringValue()*/ + "|");
+                //System.out.println("Row: " + row.get(i).getDisplayStringValue());
                 String valores = "";
                 Cell cell1 = ws.getCells().get(i);
-                System.out.println("Cell1: " + cell1.getValue());
+                //System.out.println("Cell1: " + cell1.getValue());
 
 
                 for (int j = 0; j < rows; j++) {
                     Cell cell = ws.getCells().get(i+1, j);
                     valores = ws.getCells().checkRow(j+1).get(i).getDisplayStringValue();
-                    System.out.println("Cell: " + cell.getValue());
+                    //System.out.println("Cell: " + cell.getValue());
                     if (valores.isEmpty()) {
                         valores = "0";
                     }
-                    if (cell.toString().isEmpty()){
-                        cell.putValue("0");
-                    }
+                    //if (cell.toString().isEmpty()){
+                    //    cell.putValue("0");
+                    //}
                     //System.out.println("Valores: " + valores);
-                    //datosExcel.put();
+                    datosExcel.put(encabezados, valores);
                     //System.out.println("Datos Excel: " + datosExcel.put(encabezados, valores));
-                    //System.out.println("Datos Excel-e: " + datosExcel.get(encabezados));
-                    datosExcel1.put(cell1, cell);
-                    System.out.println("DatosExcel 1: " + datosExcel1.get(cell1).getValue());
+                    System.out.println("Datos Excel-e: " + datosExcel.get(encabezados));
+                    //datosExcel1.put(cell1, cell);
+                    //System.out.println("DatosExcel 1: " + datosExcel1.get(cell1).getValue());
                 }
 
             }

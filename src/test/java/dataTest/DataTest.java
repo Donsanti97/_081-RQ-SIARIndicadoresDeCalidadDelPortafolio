@@ -5,17 +5,41 @@ import org.testng.annotations.Test;
 
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class DataTest {
 
+    //Método para hallar similitudes entre dos cadenas
     private static double calculateSimilarity(String str1, String str2, LevenshteinDistance distance) {
         int maxLen = Math.max(str1.length(), str2.length());
         return 1.0 - (double) distance.apply(str1, str2) / maxLen;
     }
 
+    //Método que conierte las letras en código ascii, lo ordena de menor a mayor y devuelve la cadena ordenada
+    public static String convertToAsciiAndSort(String input) {
+        String toLowerCaseinput = convertToLowerCase(input);
+        int[] asciiValues = new int[toLowerCaseinput.length()];
+        for (int i = 0; i < toLowerCaseinput.length(); i++) {
+            asciiValues[i] = toLowerCaseinput.charAt(i); // Obtener el valor ASCII de cada carácter
+        }
+
+        Arrays.sort(asciiValues); // Ordenar de menor a mayor (valores ASCII)
+
+        StringBuilder result = new StringBuilder();
+        for (int value : asciiValues) {
+            result.append((char) value); // Convertir el valor ASCII de nuevo a carácter
+        }
+
+        return result.toString();
+    }
+
+    //Método que convierte las letras mayúsculas en minúsuclas de un string
+    public static String convertToLowerCase(String input) {
+        return input.toLowerCase();
+    }
 
     @Test(description = "Consulta de campos tipo String")
     public static void consultaDatos() {
@@ -56,13 +80,20 @@ public class DataTest {
 
             for (int sheetIndex1 = 0; sheetIndex1 < workbook1.getWorksheets().getCount(); sheetIndex1++) {
                 String name1 = workbook1.getWorksheets().get(sheetIndex1).getName();
+                String newName1 = name1/*.replaceAll("\\s", "")*/.replaceAll("(\\d)a(\\d)", "$1$2").replaceAll("_", "").replaceAll("Mas", ">").replaceAll("MenIgu", "<=");
+                String finalName1 = convertToAsciiAndSort(newName1);
 
                 for (int sheetIndex2 = 0; sheetIndex2 < workbook2.getWorksheets().getCount(); sheetIndex2++) {
                     String name2 = workbook2.getWorksheets().get(sheetIndex2).getName();
+                    String newName2 = name2.replaceAll("\\s", "").replaceAll("-", "").replaceAll("_", "")
+                            .replaceAll("\\.", "");
+                    String finalName2 = convertToAsciiAndSort(newName2);
 
-                    double similarity = calculateSimilarity(name1, name2, levenshteinDistance);
 
-                    if (similarity >= 0.5) { // Cambia este valor según la similitud deseada
+                    double similarity = calculateSimilarity(finalName1, finalName2, levenshteinDistance);
+
+                    if (similarity >= 0.9) { // Cambia este valor según la similitud deseada (Medida ideal, toma TODAS las hojas)
+                        System.out.println("Similarity " + similarity + ", Final names " + name1 + ", " + name2);
                         duplicateSheetNames.add(name1);
                         duplicateSheetNames.add(name2);
                     }
@@ -111,6 +142,8 @@ public class DataTest {
             } else {
                 System.out.println("No se encontraron hojas con el mismo nombre en ambos archivos.");
             }*/
+
+
             //Generando index para identificar todas las hojas dentro de los archivos
             for (int worksheetIndex = 0; worksheetIndex < maxWorksheets; worksheetIndex++) {
 
@@ -144,7 +177,7 @@ public class DataTest {
                                     String value1 = cell1.getStringValue();
                                     String value2 = cell2.getStringValue();
                                     if (!value1.equals(value2)) {
-                                        System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1));
+                                        //System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1));
                                     }
                                 } else if (cell1.getType() == CellValueType.IS_NUMERIC && cell2.getType() == CellValueType.IS_NUMERIC) {
                                     double value1 = cell1.getDoubleValue();
@@ -153,10 +186,10 @@ public class DataTest {
                                     decimalValue1 = decimalValue1.setScale(2, BigDecimal.ROUND_HALF_UP);
                                     double doubleNum = decimalValue1.doubleValue();
                                     if (Math.abs(value1 - doubleNum) > 0.001) {
-                                        System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1) + "(Numeros decimales)");
+                                        //System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1) + "(Numeros decimales)");
                                     }
                                     if (value1 != value2) {
-                                        System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1));
+                                        //System.out.println("Diferencia en la fila " + (row + 1) + ", columna " + (col + 1));
                                     }
                                 }
 
