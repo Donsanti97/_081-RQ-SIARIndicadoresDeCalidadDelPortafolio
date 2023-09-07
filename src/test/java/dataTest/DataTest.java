@@ -18,7 +18,7 @@ public class DataTest {
         return 1.0 - (double) distance.apply(str1, str2) / maxLen;
     }
 
-    //Método que conierte las letras en código ascii, lo ordena de menor a mayor y devuelve la cadena ordenada
+    //Método que comvierte las letras en código ascii, lo ordena de menor a mayor y devuelve la cadena ordenada
     public static String convertToAsciiAndSort(String input) {
         String toLowerCaseinput = convertToLowerCase(input);
         int[] asciiValues = new int[toLowerCaseinput.length()];
@@ -82,11 +82,12 @@ public class DataTest {
                 String name1 = workbook1.getWorksheets().get(sheetIndex1).getName();
                 String newName1 = name1/*.replaceAll("\\s", "")*/.replaceAll("(\\d)a(\\d)", "$1$2").replaceAll("_", "").replaceAll("Mas", ">").replaceAll("MenIgu", "<=");
                 String finalName1 = convertToAsciiAndSort(newName1);
+                System.out.println(finalName1);
 
                 for (int sheetIndex2 = 0; sheetIndex2 < workbook2.getWorksheets().getCount(); sheetIndex2++) {
                     String name2 = workbook2.getWorksheets().get(sheetIndex2).getName();
                     String newName2 = name2.replaceAll("\\s", "").replaceAll("-", "").replaceAll("_", "")
-                            .replaceAll("\\.", "");
+                            .replaceAll("(\\d)\\.(\\d)", "$1$2");
                     String finalName2 = convertToAsciiAndSort(newName2);
 
 
@@ -108,40 +109,6 @@ public class DataTest {
             } else {
                 System.out.println("No se encontraron hojas con nombres similares en ambos archivos.");
             }
-
-
-            //Esta secció de codigo verifica si hay nombres de hojas iguales tomando en cuenta que le quita los espacios a las hojas que tengan
-            /*Set<String> sheetNames1 = new HashSet<>();
-            Set<String> duplicateSheetNames = new HashSet<>();
-
-            for (int sheetIndex = 0; sheetIndex < workbook1.getWorksheets().getCount(); sheetIndex++) {
-                String name = workbook1.getWorksheets().get(sheetIndex).getName();
-                String newName = name.replaceAll("\\s", "");
-
-                if (sheetNames1.contains(newName)) {
-                    duplicateSheetNames.add(newName);
-                } else {
-                    sheetNames1.add(newName);
-                }
-            }
-
-            for (int sheetIndex = 0; sheetIndex < workbook2.getWorksheets().getCount(); sheetIndex++) {
-                String name = workbook2.getWorksheets().get(sheetIndex).getName();
-                String newName = name.replaceAll("\\s", "");
-
-                if (sheetNames1.contains(newName)) {
-                    duplicateSheetNames.add(newName);
-                }
-            }
-
-            if (!duplicateSheetNames.isEmpty()) {
-                System.out.println("Las siguientes hojas tienen el mismo nombre en ambos archivos:");
-                for (String name : duplicateSheetNames) {
-                    System.out.println(name);
-                }
-            } else {
-                System.out.println("No se encontraron hojas con el mismo nombre en ambos archivos.");
-            }*/
 
 
             //Generando index para identificar todas las hojas dentro de los archivos

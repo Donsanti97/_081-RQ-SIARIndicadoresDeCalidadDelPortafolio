@@ -102,8 +102,6 @@ public class EjercicioDeEncabezados {
             Worksheet worksheetB = workbookB.getWorksheets().get(3);
             Set<String> headers1 = new HashSet<>(getHeaders(worksheetA, 0));
             String s = headers1.toString();
-            String se = "";
-                    se = s.replaceAll("/", "-");
 
             Set<String> headers2 = new HashSet<>(getHeaders(worksheetB, 168/*findHeaderRow(worksheetB, headers1)*/));
             String se1 = headers2.toString();
@@ -147,7 +145,9 @@ public class EjercicioDeEncabezados {
             }
             System.out.println("Encabezados 1: " + headers1);
             System.out.println(se1);
+            System.out.println();
             System.out.println("Encabezados 2; " + headers2);
+
 
             //Set<String> commonHeaders = new HashSet<>(headers1);
             //commonHeaders.retainAll(headers2);
