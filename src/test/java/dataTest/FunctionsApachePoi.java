@@ -1,13 +1,22 @@
 package dataTest;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFPivotTable;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.testng.annotations.Test;
+import org.apache.poi.util.*;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 public class FunctionsApachePoi {
+
     public static List<String> obtenerNombresDeHojas(String excelFilePath) {
         List<String> sheetNames = new ArrayList<>();
         try {
@@ -76,6 +85,49 @@ public class FunctionsApachePoi {
             e.printStackTrace();
         }
         return data;
+    }
+
+    @Test
+    //Metodo para creación de tablas dinámicas
+    public static void tablasDinamicasApachePoi() throws IOException {
+        String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\OKCARTERA.20230426.xlsx";
+        String sName = "OKCARTERA.20230426";
+
+        try {
+            IOUtils.setByteArrayMaxOverride(300000000);
+
+            InputStream fileInputStream = new FileInputStream(file1);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+
+            //Definir hoja
+            Sheet sheet = workbook.getSheet(sName);
+
+            //Generar el area de los datos
+            CellReference topLeft = new CellReference(sheet.getFirstRowNum(), sheet.getRow(sheet.getFirstRowNum()).getLastCellNum() - 1);
+            CellReference bottomRight = new CellReference(sheet.getLastRowNum(), sheet.getRow(sheet.getLastRowNum()).getLastCellNum() - 1);
+            AreaReference source = new AreaReference(topLeft, bottomRight, sheet.getWorkbook().getSpreadsheetVersion());
+
+            //Crea la tabla dinamica en la hoja de trabajo
+            XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, new CellReference("DW12"));
+            pivotTable.addRowLabel(12);//Agregar etiqueta de fila para el campo a filtrar
+            pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 15, "Suma de capital");//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma
+
+            //Guardar excel
+            FileOutputStream fileout = new FileOutputStream(file1);
+            workbook.write(fileout);
+            fileout.close();
+
+            //Se cierra excel
+            workbook.close();
+
+            System.out.println("Tabla dinamica creada");
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 }
 
