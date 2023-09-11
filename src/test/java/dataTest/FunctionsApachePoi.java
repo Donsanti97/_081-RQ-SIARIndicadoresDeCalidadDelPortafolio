@@ -90,8 +90,8 @@ public class FunctionsApachePoi {
     @Test
     //Metodo para creación de tablas dinámicas
     public static void tablasDinamicasApachePoi() throws IOException {
-        String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\OKCARTERA.20230426.xlsx";
-        String sName = "OKCARTERA.20230426";
+        String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx";//OKCARTERA.20230426
+        String sName = "Hoja1";
 
         try {
             IOUtils.setByteArrayMaxOverride(300000000);
@@ -103,14 +103,18 @@ public class FunctionsApachePoi {
             Sheet sheet = workbook.getSheet(sName);
 
             //Generar el area de los datos
-            CellReference topLeft = new CellReference(sheet.getFirstRowNum(), sheet.getRow(sheet.getFirstRowNum()).getLastCellNum() - 1);
+            CellReference topLeft = new CellReference(sheet.getFirstRowNum(), sheet.getRow(sheet.getFirstRowNum()).getFirstCellNum());
             CellReference bottomRight = new CellReference(sheet.getLastRowNum(), sheet.getRow(sheet.getLastRowNum()).getLastCellNum() - 1);
             AreaReference source = new AreaReference(topLeft, bottomRight, sheet.getWorkbook().getSpreadsheetVersion());
+            System.out.println(source);
 
             //Crea la tabla dinamica en la hoja de trabajo
-            XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, new CellReference("DW12"));
-            pivotTable.addRowLabel(12);//Agregar etiqueta de fila para el campo a filtrar
-            pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 15, "Suma de capital");//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma
+            XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, new CellReference("E13"));//DW12
+            pivotTable.addRowLabel(0);//Agregar etiqueta de fila para el campo Modalidad (12)
+            pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 2, "Suma de Cantidad");//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
+            pivotTable.addColLabel(1);
+
+            //pivotTable.getCTPivotTableDefinition().getFilters();
 
             //Guardar excel
             FileOutputStream fileout = new FileOutputStream(file1);
