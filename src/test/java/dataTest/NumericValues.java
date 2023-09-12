@@ -1,95 +1,70 @@
 package dataTest;
 
-import com.aspose.cells.*;
 import org.testng.annotations.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static dataTest.FunctionsApachePoi.*;
+
 
 public class NumericValues {
 
+    @Test
+    public static void findFields() {
 
+        String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
+
+        List<String> sheetNames = obtenerNombresDeHojas(excelFilePath);
+
+        List<String> headers = null;
+        List<Map<String, String>> datosFiltrados = null;
+        for (String sheetName : sheetNames) {
+            System.out.println("Contenido de la hoja: " + sheetName);
+            headers = obtenerEncabezados(excelFilePath, sheetName);
+
+            // Listar campos disponibles
+            System.out.println("Campos disponibles:");
+            for (String header : headers) {
+                System.out.println(header);
+            }
+
+            // Especifica el campo en el que deseas aplicar el filtro
+            String campoFiltrar = "TipoProducto";
+            String valorInicio = "bebida"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "bebida"; // Reemplaza con el valor de fin del rango
+
+            // Filtrar los datos por el campo y el rango especificados
+            datosFiltrados = obtenerValoresDeEncabezados(excelFilePath, sheetName, campoFiltrar, valorInicio, valorFin);
+
+            // Especifica los campos que deseas obtener
+            List<String> camposDeseados = Arrays.asList("producto", "cantidad");
+
+            // Imprimir datos filtrados
+            System.out.println("Datos filtrados por " + campoFiltrar + " en el rango [" + valorInicio + ", " + valorFin + "]");
+            for (Map<String, String> rowData : datosFiltrados) {
+                for (String campoDeseado : camposDeseados) {
+                    String valorCampo = rowData.get(campoDeseado);
+                    System.out.println(campoDeseado + ": " + valorCampo);
+                }
+                System.out.println();
+            }
+
+            System.out.println("----------------------");
+        }
+
+        // Crear una nueva hoja Excel con los datos filtrados
+        String nuevaHojaFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx"; // Reemplaza con la ruta y nombre de tu nuevo archivo Excel
+        crearNuevaHojaExcel(nuevaHojaFilePath, headers, datosFiltrados);
+
+        System.out.println("----------------------");
+    }
 
     @Test
-    public static void createDinamicTableAposeCells() throws Exception {
-        String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
-
-        // Crear una instancia de un objeto Workbook
-        Workbook workbook = new Workbook(file1);
-
-// Accede a la ficha
-        Worksheet sheet2 = workbook.getWorksheets().get(1);
-
-// Obtenga la colección de tablas dinámicas en la hoja
-        PivotTableCollection pivotTables = sheet2.getPivotTables();
-
-// Agregar una tabla dinámica a la hoja de trabajo
-        int index = pivotTables.add("=Data!A1:DT180936", "DX4", "PivotTable1");
-
-// Acceda a la instancia de la tabla dinámica recién agregada
-        PivotTable pivotTable = pivotTables.get(index);
-
-// Mostrar los totales generales
-        pivotTable.setRowGrand(true);
-        pivotTable.setColumnGrand(true);
-
-// Establecer que el informe de tabla dinámica se formatea automáticamente
-        pivotTable.setAutoFormat(true);
-
-// Establezca el tipo de formato automático de la tabla dinámica.
-        pivotTable.setAutoFormatType(PivotTableAutoFormatType.REPORT_6);
-
-// Arrastre el primer campo al área de la fila.
-        pivotTable.addFieldToArea(PivotFieldType.ROW, 8);//Codigo_sucursal
-
-// Arrastre el tercer campo al área de la fila.
-        pivotTable.addFieldToArea(PivotFieldType.ROW, 2);
-
-// Arrastre el segundo campo al área de la fila.
-        pivotTable.addFieldToArea(PivotFieldType.ROW, 1);
-
-// Arrastre el cuarto campo al área de la columna.
-        pivotTable.addFieldToArea(PivotFieldType.COLUMN, 3);
-
-// Arrastre el quinto campo al área de datos.
-        pivotTable.addFieldToArea(PivotFieldType.DATA, 12);//Modalidad
-        pivotTable.addFieldToArea(PivotFieldType.DATA, 15);//dias_de_mora
-
-// Establecer el formato de número del primer campo de datos
-        pivotTable.getDataFields().get(0).setNumber(7);
-
-// Guarde el archivo de Excel
-        workbook.save("pivotTable.xls");
-
+    public static void deleteTempFile(){
+        eliminarExcel(System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx", 5);
     }
 
 
-    /*@Test
-    public static void modificarMacro() throws Exception {
-        String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsm";
-        Workbook workbook = new Workbook(file1);
-
-        try {
-            Worksheet worksheet = workbook.getWorksheets().get(0);
-            VbaModuleCollection modules = workbook.getVbaProject().getModules();
-            VbaModule module = modules.get(0);
-            System.out.println(module.getName());
-            String code = module.getCodes();
-
-            if (code.contains("Holis")){
-                code = code.replace("Holis", "Holis2");
-                module.setCodes(code);
-            }
-
-            /*for (int i = 0; i < modules.getCount(); i++) {
-                VbaModule module = modules.get(i);
-                String code = module.getCodes();
-
-                if (code.contains("This is test message.")) {
-                    code = code.replace("This is test message.", "This is Apose.Cells message.");
-                }
-            }
-            workbook.save("TestData.xlsm");
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }*/
 }
