@@ -76,8 +76,6 @@ public class Funcionalidades {
         return headers;
     }
 
-
-
     public static List<String> getWorksheets(Workbook workbook){
 
         List<String> sheetNames = new ArrayList<>();
@@ -97,9 +95,6 @@ public class Funcionalidades {
 
         return sheetNames;
     }
-
-
-
 
     //Método para hallar similitudes entre dos cadenas
     private static double calculateSimilarity(String str1, String str2, LevenshteinDistance distance) {

@@ -164,6 +164,8 @@ public class FunctionsApachePoi {
         return sheetNames;
     }
 
+    //Metodo para obtener los encabezados de una hoja excel
+
     //Metodo para obtener los encabezados en las hojas
     public static List<String> obtenerEncabezados(String excelFilePath, String sheetName) {
         List<String> headers = new ArrayList<>();
@@ -471,6 +473,90 @@ public class FunctionsApachePoi {
         }
 
 
+    }
+
+/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+    public static List<String> obtenerEncabezados(Sheet sheet) {
+        List<String> encabezados = new ArrayList<>();
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+
+            // Aquí puedes especificar en qué fila esperas encontrar los encabezados
+            // Por ejemplo, si están en la tercera fila (fila índice 2), puedes usar:
+            if (row.getRowNum() == 0) {
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    encabezados.add(obtenerValorCelda(cell));
+                }
+                break; // Terminamos de buscar encabezados una vez que los encontramos
+            }
+        }
+
+        return encabezados;
+    }
+
+    public static List<String> encontrarEncabezadosSegundoArchivo(Sheet sheet, Workbook workbook2) {
+        List<String> encabezadosSegundoArchivo = new ArrayList<>();
+
+        // Busca el primer encabezado del primer archivo en la misma columna en el segundo archivo
+        for (int columnIndex = 0; columnIndex < sheet.getRow(0).getLastCellNum(); columnIndex++) {
+            String primerEncabezado = obtenerValorCelda(sheet.getRow(0).getCell(columnIndex));
+            if (buscarEncabezadoEnColumna(primerEncabezado, columnIndex, workbook2)) {
+                Sheet segundoSheet = workbook2.getSheetAt(0); // Puedes especificar el índice de la hoja del segundo archivo
+                Iterator<Row> rowIterator = segundoSheet.iterator();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+                    Cell cell = row.getCell(columnIndex);
+                    encabezadosSegundoArchivo.add(obtenerValorCelda(cell));
+                }
+                break; // Terminamos de buscar encabezados en el segundo archivo
+            }
+        }
+
+        return encabezadosSegundoArchivo;
+    }
+
+    private static boolean buscarEncabezadoEnColumna(String encabezado, int columnIndex, Workbook workbook) {
+        Sheet sheet = workbook.getSheetAt(0); // Puedes especificar el índice de la hoja del segundo archivo
+        Iterator<Row> rowIterator = sheet.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Cell cell = row.getCell(columnIndex);
+            String valor = obtenerValorCelda(cell);
+            if (encabezado.equals(valor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static String obtenerValorCelda(Cell cell) {
+        String valor = "";
+        if (cell != null) {
+            switch (cell.getCellType()) {
+                case STRING:
+                    valor = cell.getStringCellValue();
+                    break;
+                case NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        valor = cell.getDateCellValue().toString();
+                    } else {
+                        valor = Double.toString(cell.getNumericCellValue());
+                    }
+                    break;
+                case BOOLEAN:
+                    valor = Boolean.toString(cell.getBooleanCellValue());
+                    break;
+                case FORMULA:
+                    valor = cell.getCellFormula();
+                    break;
+                default:
+                    break;
+            }
+        }
+        return valor;
     }
 }
 
