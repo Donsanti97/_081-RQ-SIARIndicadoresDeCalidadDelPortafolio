@@ -50,9 +50,8 @@ public class FunctionsApachePoi {
         return data;
     }
 
-
     //Metodo para creación de tablas dinámicas
-    public static void tablasDinamicasApachePoi() throws IOException {
+    public static void tablasDinamicasApachePoi(/*String filepath, String hoja, String*/) throws IOException {
         String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx";//OKCARTERA.20230426
         String sName = "Hoja1";
 
@@ -71,13 +70,62 @@ public class FunctionsApachePoi {
             AreaReference source = new AreaReference(topLeft, bottomRight, sheet.getWorkbook().getSpreadsheetVersion());
             System.out.println(source);
 
+
+            CellReference pivotCellReference = new CellReference(2, bottomRight.getCol() + 2);
+
+
+            int startColIndex = pivotCellReference.getCol();
+            int endColIndex = startColIndex + 1;
+            // Eliminar las columnas donde se creó la tabla dinámica
+            for (int i = endColIndex; i >= startColIndex; i--) {
+                for (Row row : sheet) {
+                    Cell cell = row.getCell(i);
+                    if (cell != null) {
+                        row.removeCell(cell);
+                    }
+                }
+            }
+            /*XSSFSheet xssfSheet = (XSSFSheet) sheet;
+            for (XSSFPivotTable pivotTable : xssfSheet.getPivotTables()) {
+                // Obtiene la celda de inicio de la tabla dinámica
+                CellReference topLeftCell = pivotTable.getCTPivotTableDefinition().getRef();
+                int firstRow = topLeftCell.getRow();
+                int firstCol = topLeftCell.getCol();
+
+                // Obtiene la celda de fin de la tabla dinámica
+                int lastRow = firstRow + pivotTable.getRowCount();
+                int lastCol = firstCol + pivotTable.getColCount();
+
+                // Imprime el rango de celdas de la tabla dinámica
+                System.out.println("Rango de la tabla dinámica:");
+                System.out.println("Desde: " + new CellReference(firstRow, firstCol));
+                System.out.println("Hasta: " + new CellReference(lastRow - 1, lastCol - 1));
+            }*/
+
+            // Buscar y eliminar cualquier tabla dinámica existente en la hoja de cálculo
+            /*XSSFSheet xssfSheet = (XSSFSheet) sheet;
+            List<XSSFPivotTable> pivotTables = xssfSheet.getPivotTables();
+            if (!pivotTables.isEmpty()) {
+                for (XSSFPivotTable pivotTable1 : pivotTables) {
+                    System.out.println(pivotTable1.toString() + "----------");
+                    // Eliminar las columnas donde se creó la tabla dinámica
+                    for (int i = endColIndex; i >= startColIndex; i--) {
+                        for (Row row : sheet) {
+                            Cell cell = row.getCell(i);
+                            if (cell != null) {
+                                row.removeCell(cell);
+                            }
+                        }
+                    }
+                }
+            }*/
+
             //Crea la tabla dinamica en la hoja de trabajo
-            XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, new CellReference("E13"));//DW12
+            XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, pivotCellReference);//DW12
             pivotTable.addRowLabel(0);//Agregar etiqueta de fila para el campo Modalidad (12)
-            //pivotTable.addColLabel(0, "bebida");
-            //pivotTable.
             pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 2, "Suma de Cantidad");//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
-            //pivotTable.addColLabel(1);
+
+
 
             //Guardar excel
             FileOutputStream fileout = new FileOutputStream(file1);
@@ -217,6 +265,153 @@ public class FunctionsApachePoi {
         return datosFiltrados;
     }
 
+    //Método para obtener valores de dos encabezados de un rango específico de valores cada uno
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, String valorInicio1, String valorFin1, String campoFiltrar2, String valorInicio2, String valorFin2) {
+        List<Map<String, String>> datosFiltrados = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            List<String> headers = obtenerEncabezados(excelFilePath, sheetName);
+            int campoFiltrarIndex1 = headers.indexOf(campoFiltrar1);
+            int campoFiltrarIndex2 = headers.indexOf(campoFiltrar2);
+            if (campoFiltrarIndex1 == -1 || campoFiltrarIndex2 == -1) {
+                System.err.println("Alguno de los campos especificados para el filtro no existe.");
+                return datosFiltrados;
+            }
+
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            for (int rowIndex = 1; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Cell cell1 = row.getCell(campoFiltrarIndex1);
+                Cell cell2 = row.getCell(campoFiltrarIndex2);
+                String valorCelda1 = (cell1 != null && cell1.getCellType() == CellType.STRING) ? cell1.getStringCellValue() : "";
+                String valorCelda2 = (cell2 != null && cell2.getCellType() == CellType.STRING) ? cell2.getStringCellValue() : "";
+                if (valorCelda1.compareTo(valorInicio1) >= 0 && valorCelda1.compareTo(valorFin1) <= 0 &&
+                        valorCelda2.compareTo(valorInicio2) >= 0 && valorCelda2.compareTo(valorFin2) <= 0) {
+                    Map<String, String> rowData = new HashMap<>();
+                    for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                        Cell dataCell = row.getCell(cellIndex);
+                        String header = headers.get(cellIndex);
+                        String value = "";
+                        if (dataCell != null) {
+                            if (dataCell.getCellType() == CellType.STRING) {
+                                value = dataCell.getStringCellValue();
+                            } else if (dataCell.getCellType() == CellType.NUMERIC) {
+                                value = String.valueOf(dataCell.getNumericCellValue());
+                            }
+                        }
+                        rowData.put(header, value);
+                    }
+                    datosFiltrados.add(rowData);
+                }
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return datosFiltrados;
+    }
+
+    //Método para obtener valores de dos encabezados de un rango específico cada uno, en campos numéricos
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, double valorInicio1, double valorFin1, String campoFiltrar2, double valorInicio2, double valorFin2) {
+        List<Map<String, String>> datosFiltrados = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            List<String> headers = obtenerEncabezados(excelFilePath, sheetName);
+            int campoFiltrarIndex1 = headers.indexOf(campoFiltrar1);
+            int campoFiltrarIndex2 = headers.indexOf(campoFiltrar2);
+            if (campoFiltrarIndex1 == -1 || campoFiltrarIndex2 == -1) {
+                System.err.println("Alguno de los campos especificados para el filtro no existe.");
+                return datosFiltrados;
+            }
+
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            for (int rowIndex = 1; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Cell cell1 = row.getCell(campoFiltrarIndex1);
+                Cell cell2 = row.getCell(campoFiltrarIndex2);
+                double valorCelda1 = (cell1 != null && cell1.getCellType() == CellType.NUMERIC) ? cell1.getNumericCellValue() : 0.0;
+                double valorCelda2 = (cell2 != null && cell2.getCellType() == CellType.NUMERIC) ? cell2.getNumericCellValue() : 0.0;
+                if (valorCelda1 >= valorInicio1 && valorCelda1 <= valorFin1 &&
+                        valorCelda2 >= valorInicio2 && valorCelda2 <= valorFin2) {
+                    Map<String, String> rowData = new HashMap<>();
+                    for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                        Cell dataCell = row.getCell(cellIndex);
+                        String header = headers.get(cellIndex);
+                        String value = "";
+                        if (dataCell != null) {
+                            if (dataCell.getCellType() == CellType.STRING) {
+                                value = dataCell.getStringCellValue();
+                            } else if (dataCell.getCellType() == CellType.NUMERIC) {
+                                value = String.valueOf(dataCell.getNumericCellValue());
+                            }
+                        }
+                        rowData.put(header, value);
+                    }
+                    datosFiltrados.add(rowData);
+                }
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return datosFiltrados;
+    }
+
+    //Método para obtener valores de los encabezados de un rango específico cada uno, el primero rango String y el segundo rango double
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, String valorInicio1, String valorFin1, String campoFiltrar2, double valorInicio2, double valorFin2) {
+        List<Map<String, String>> datosFiltrados = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            List<String> headers = obtenerEncabezados(excelFilePath, sheetName);
+            int campoFiltrarIndex1 = headers.indexOf(campoFiltrar1);
+            int campoFiltrarIndex2 = headers.indexOf(campoFiltrar2);
+            if (campoFiltrarIndex1 == -1 || campoFiltrarIndex2 == -1) {
+                System.err.println("Alguno de los campos especificados para el filtro no existe.");
+                return datosFiltrados;
+            }
+
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            for (int rowIndex = 1; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Cell cell1 = row.getCell(campoFiltrarIndex1);
+                Cell cell2 = row.getCell(campoFiltrarIndex2);
+                String valorCelda1 = (cell1 != null && cell1.getCellType() == CellType.STRING) ? cell1.getStringCellValue() : "";
+                double valorCelda2 = (cell2 != null && cell2.getCellType() == CellType.NUMERIC) ? cell2.getNumericCellValue() : 0.0;
+                if (valorCelda1.compareTo(valorInicio1) >= 0 && valorCelda1.compareTo(valorFin1) <= 0 &&
+                        valorCelda2 >= valorInicio2 && valorCelda2 <= valorFin2) {
+                    Map<String, String> rowData = new HashMap<>();
+                    for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                        Cell dataCell = row.getCell(cellIndex);
+                        String header = headers.get(cellIndex);
+                        String value = "";
+                        if (dataCell != null) {
+                            if (dataCell.getCellType() == CellType.STRING) {
+                                value = dataCell.getStringCellValue();
+                            } else if (dataCell.getCellType() == CellType.NUMERIC) {
+                                value = String.valueOf(dataCell.getNumericCellValue());
+                            }
+                        }
+                        rowData.put(header, value);
+                    }
+                    datosFiltrados.add(rowData);
+                }
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return datosFiltrados;
+    }
+
     //Metodo que crea una nueva hoja excel con información específica ya tratada en un archivo excel nuevo
     public static void crearNuevaHojaExcel(String filePath, List<String> headers, List<Map<String, String>> data) {
         Workbook workbook = new XSSFWorkbook();
@@ -241,15 +436,12 @@ public class FunctionsApachePoi {
             }
         }
 
-        int counter = 0;
-        if (new File(filePath).exists()){
-            counter++;
-            String filename = filePath + counter + "xlsx";
-            filePath = filename;
-        }
+
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             workbook.write(fos);
-            System.out.println("Nueva hoja Excel creada en: " + filePath);
+            System.out.println("Nueva hoja Excel creada o reemplazada en: " + filePath);
+            fos.close();
+            workbook.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -36,7 +36,7 @@ public class NumericValues {
             String valorFin = "bebida"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
-            datosFiltrados = obtenerValoresDeEncabezados(excelFilePath, sheetName, campoFiltrar, valorInicio, valorFin);
+            datosFiltrados = obtenerValoresDeEncabezados(excelFilePath, sheetName, campoFiltrar, valorInicio, valorFin, "entrega", 1, 3);
 
             // Especifica los campos que deseas obtener
             List<String> camposDeseados = Arrays.asList("producto", "cantidad");
@@ -59,6 +59,8 @@ public class NumericValues {
         crearNuevaHojaExcel(nuevaHojaFilePath, headers, datosFiltrados);
 
         System.out.println("----------------------");
+
+
     }
 
     @Test
