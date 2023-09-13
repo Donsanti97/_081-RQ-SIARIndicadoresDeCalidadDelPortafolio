@@ -498,21 +498,51 @@ public class FunctionsApachePoi {
         return encabezados;
     }
 
-    public static List<String> encontrarEncabezadosSegundoArchivo(Sheet sheet, Workbook workbook2) {
+    public static List<String> encabezadosSegundoArchivo(String encabezadoBuscado, Workbook workbook2, Workbook workbook1){
+
+
+        Sheet sheet1 = workbook1.getSheetAt(0);
+        Sheet sheet2 = workbook2.getSheetAt(3);
+        List<String> encabezados1 = obtenerEncabezados(sheet1);
+        List<String> encabezados = Collections.singletonList(encabezados1.get(0));
+        Iterator<Row> rowIterator = sheet2.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Iterator<Cell> cellIterator = row.cellIterator();
+            while (cellIterator.hasNext()) {
+                Cell cell = cellIterator.next();
+                String valor = obtenerValorCelda(cell);
+                for (String encabezado : encabezados1)
+                if (encabezadoBuscado.equals(valor)) {
+
+                }
+            }
+        }
+
+
+
+    }
+
+    public static List<String> encontrarEncabezadosSegundoArchivo(String encabezadoBuscado, Workbook workbook2) {
         List<String> encabezadosSegundoArchivo = new ArrayList<>();
 
-        // Busca el primer encabezado del primer archivo en la misma columna en el segundo archivo
-        for (int columnIndex = 0; columnIndex < sheet.getRow(0).getLastCellNum(); columnIndex++) {
-            String primerEncabezado = obtenerValorCelda(sheet.getRow(0).getCell(columnIndex));
-            if (buscarEncabezadoEnColumna(primerEncabezado, columnIndex, workbook2)) {
-                Sheet segundoSheet = workbook2.getSheetAt(0); // Puedes especificar el índice de la hoja del segundo archivo
-                Iterator<Row> rowIterator = segundoSheet.iterator();
-                while (rowIterator.hasNext()) {
-                    Row row = rowIterator.next();
-                    Cell cell = row.getCell(columnIndex);
-                    encabezadosSegundoArchivo.add(obtenerValorCelda(cell));
+        Sheet sheet2 = workbook2.getSheetAt(3); // Hoja del segundo archivo
+        Iterator<Row> rowIterator = sheet2.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Iterator<Cell> cellIterator = row.cellIterator();
+            while (cellIterator.hasNext()) {
+                Cell cell = cellIterator.next();
+                String valor = obtenerValorCelda(cell);
+                if (encabezadoBuscado.equals(valor)) {
+                    // Cuando encuentre el encabezado buscado, toma la fila como encabezados del segundo archivo
+                    Iterator<Cell> headerIterator = row.cellIterator();
+                    while (headerIterator.hasNext()) {
+                        Cell headerCell = headerIterator.next();
+                        encabezadosSegundoArchivo.add(obtenerValorCelda(headerCell));
+                    }
+                    return encabezadosSegundoArchivo;
                 }
-                break; // Terminamos de buscar encabezados en el segundo archivo
             }
         }
 

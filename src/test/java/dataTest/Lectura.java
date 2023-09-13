@@ -24,9 +24,10 @@ public class Lectura {
             Workbook workbook2 = new XSSFWorkbook(excelFile2);
             Workbook workbook = new XSSFWorkbook(excelFile);
             Sheet sheet = workbook.getSheetAt(0); // Puedes especificar el índice de la hoja que desees procesar
+            Sheet sheet2 = workbook2.getSheetAt(0);
 
             List<String> encabezados = obtenerEncabezados(sheet);
-            List<String> encabezadosSegundoArchivo = encontrarEncabezadosSegundoArchivo(sheet, workbook2);
+            List<String> encabezadosSegundoArchivo = encontrarEncabezadosSegundoArchivo(encabezados.get(0), workbook2);
 
             for (String encabezado : encabezados) {
                 System.out.println("Encabezado: " + encabezado);
