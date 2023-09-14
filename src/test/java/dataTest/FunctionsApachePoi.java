@@ -164,7 +164,6 @@ public class FunctionsApachePoi {
         return sheetNames;
     }
 
-    //Metodo para obtener los encabezados de una hoja excel
 
     //Metodo para obtener los encabezados en las hojas
     public static List<String> obtenerEncabezados(String excelFilePath, String sheetName) {
@@ -498,51 +497,60 @@ public class FunctionsApachePoi {
         return encabezados;
     }
 
-    public static List<String> encabezadosSegundoArchivo(String encabezadoBuscado, Workbook workbook2, Workbook workbook1){
+    public static List<String> obtenerNombresDeHojas(String excelFilePath, int indexFrom) {
+        List<String> sheetNames = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            int numberOfSheets = workbook.getNumberOfSheets();
+            for (int i = indexFrom; i < numberOfSheets; i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+                sheetNames.add(sheet.getSheetName());
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sheetNames;
+    }
+    public static List<String> obtenerEncabezados(Sheet sheet, int index) {
+        List<String> encabezados = new ArrayList<>();
 
-
-        Sheet sheet1 = workbook1.getSheetAt(0);
-        Sheet sheet2 = workbook2.getSheetAt(3);
-        List<String> encabezados1 = obtenerEncabezados(sheet1);
-        List<String> encabezados = Collections.singletonList(encabezados1.get(0));
-        Iterator<Row> rowIterator = sheet2.iterator();
+        Iterator<Row> rowIterator = sheet.iterator();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            Iterator<Cell> cellIterator = row.cellIterator();
-            while (cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-                String valor = obtenerValorCelda(cell);
-                for (String encabezado : encabezados1)
-                if (encabezadoBuscado.equals(valor)) {
 
+            // Aquí puedes especificar en qué fila esperas encontrar los encabezados
+            // Por ejemplo, si están en la tercera fila (fila índice 2), puedes usar:
+            if (row.getRowNum() == index) {
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    encabezados.add(obtenerValorCelda(cell));
                 }
+                break; // Terminamos de buscar encabezados una vez que los encontramos
             }
         }
 
-
-
+        return encabezados;
     }
 
-    public static List<String> encontrarEncabezadosSegundoArchivo(String encabezadoBuscado, Workbook workbook2) {
+    public static List<String> encontrarEncabezadosSegundoArchivo(Sheet sheet, Workbook workbook2) {
         List<String> encabezadosSegundoArchivo = new ArrayList<>();
 
-        Sheet sheet2 = workbook2.getSheetAt(3); // Hoja del segundo archivo
-        Iterator<Row> rowIterator = sheet2.iterator();
-        while (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            Iterator<Cell> cellIterator = row.cellIterator();
-            while (cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-                String valor = obtenerValorCelda(cell);
-                if (encabezadoBuscado.equals(valor)) {
-                    // Cuando encuentre el encabezado buscado, toma la fila como encabezados del segundo archivo
-                    Iterator<Cell> headerIterator = row.cellIterator();
-                    while (headerIterator.hasNext()) {
-                        Cell headerCell = headerIterator.next();
-                        encabezadosSegundoArchivo.add(obtenerValorCelda(headerCell));
-                    }
-                    return encabezadosSegundoArchivo;
+        // Busca el primer encabezado del primer archivo en la misma columna en el segundo archivo
+        for (int columnIndex = 0; columnIndex < sheet.getRow(0).getLastCellNum(); columnIndex++) {
+            String primerEncabezado = obtenerValorCelda(sheet.getRow(0).getCell(columnIndex));
+            if (buscarEncabezadoEnColumna(primerEncabezado, columnIndex, workbook2)) {
+                Sheet segundoSheet = workbook2.getSheetAt(3); // Puedes especificar el índice de la hoja del segundo archivo
+                Iterator<Row> rowIterator = segundoSheet.iterator();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+                    Cell cell = row.getCell(columnIndex);
+                    encabezadosSegundoArchivo.add(obtenerValorCelda(cell));
                 }
+                break; // Terminamos de buscar encabezados en el segundo archivo
             }
         }
 
@@ -550,18 +558,49 @@ public class FunctionsApachePoi {
     }
 
     private static boolean buscarEncabezadoEnColumna(String encabezado, int columnIndex, Workbook workbook) {
-        Sheet sheet = workbook.getSheetAt(0); // Puedes especificar el índice de la hoja del segundo archivo
+        Sheet sheet = workbook.getSheetAt(3); // Puedes especificar el índice de la hoja del segundo archivo
         Iterator<Row> rowIterator = sheet.iterator();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Cell cell = row.getCell(columnIndex);
             String valor = obtenerValorCelda(cell);
+            if (!valor.equals(null) || !valor.isEmpty()) {
+                valor = "0";
+            }
             if (encabezado.equals(valor)) {
                 return true;
             }
         }
         return false;
     }
+    /*-----------------------------------------------------------------------------------------*/
+    public static List<String> buscarValorEnColumna(Sheet sheet, int columnaBuscada, String valorBuscado) {
+        Iterator<Row> rowIterator = sheet.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Cell cell = row.getCell(columnaBuscada);
+            String valorCelda = obtenerValorCelda(cell);
+
+            if (valorBuscado.equals(valorCelda)) {
+                return obtenerValoresFila(row);
+            }
+        }
+
+        return null; // Valor no encontrado en la columna especificada
+    }
+
+    private static List<String> obtenerValoresFila(Row row) {
+        List<String> valoresFila = new ArrayList<>();
+        Iterator<Cell> cellIterator = row.cellIterator();
+        while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            valoresFila.add(obtenerValorCelda(cell));
+        }
+        return valoresFila;
+    }
+    /*-----------------------------------------------------------------------------------------------*/
+
+
     private static String obtenerValorCelda(Cell cell) {
         String valor = "";
         if (cell != null) {
