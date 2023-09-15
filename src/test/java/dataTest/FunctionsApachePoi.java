@@ -589,7 +589,38 @@ public class FunctionsApachePoi {
         return null; // Valor no encontrado en la columna especificada
     }
 
-    private static List<String> obtenerValoresFila(Row row) {
+    public static Map<String, List<String>> obtenerValoresPorEncabezado(Sheet sheet, List<String> encabezados) {
+        Map<String, List<String>> valoresPorEncabezado = new HashMap<>();
+
+        for (String encabezado : encabezados) {
+            valoresPorEncabezado.put(encabezado, new ArrayList<>());
+        }
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        // Omitir la primera fila ya que contiene los encabezados
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            List<String> valoresFila = obtenerValoresFila(row);
+
+            for (int i = 0; i < encabezados.size() && i < valoresFila.size(); i++) {
+                String encabezado = encabezados.get(i);
+                String valor = valoresFila.get(i);
+
+                if (valoresPorEncabezado.containsKey(encabezado)) {
+                    valoresPorEncabezado.get(encabezado).add(valor);
+                }
+            }
+        }
+
+        return valoresPorEncabezado;
+    }
+
+
+    public static List<String> obtenerValoresFila(Row row) {
         List<String> valoresFila = new ArrayList<>();
         Iterator<Cell> cellIterator = row.cellIterator();
         while (cellIterator.hasNext()) {

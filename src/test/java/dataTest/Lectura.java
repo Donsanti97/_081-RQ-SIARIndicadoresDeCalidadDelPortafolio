@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import static dataTest.FunctionsApachePoi.*;
 
 
@@ -20,8 +22,13 @@ public class Lectura {
     @Test
     public static void analisisArchivos(){
         try {
-            FileInputStream excelFile = new FileInputStream(System.getProperty("user.dir") + "\\documents\\initialDocument\\Historico Cartera Comercial.xlsx");
-            FileInputStream excelFile2 = new FileInputStream(System.getProperty("user.dir") + "\\documents\\finalDocument\\Historico Cartera COMERCIAL por OF.xlsx");
+            String file1 = System.getProperty("user.dir") + "\\documents\\initialDocument\\Historico Cartera Comercial.xlsx";
+            String file2 = System.getProperty("user.dir") + "\\documents\\finalDocument\\Historico Cartera COMERCIAL por OF.xlsx";
+            System.out.println(file1);
+            FileInputStream excelFile = new FileInputStream(file1);
+            FileInputStream excelFile2 = new FileInputStream(file2);
+
+
             Workbook workbook2 = new XSSFWorkbook(excelFile2);
             Workbook workbook = new XSSFWorkbook(excelFile);
             Sheet sheet = workbook.getSheetAt(0); // Puedes especificar el índice de la hoja que desees procesar
@@ -29,6 +36,9 @@ public class Lectura {
 
             List<String> encabezados = obtenerEncabezados(sheet);
             List<String> encabezadoTest = buscarValorEnColumna(sheet2, 0, encabezados.get(0));
+            Map<String, List<String>> valoresPorEncabezado1 = obtenerValoresPorEncabezado(sheet, encabezados);
+            //assert encabezadoTest != null;
+            Map<String, List<String>> valoresPorEncabezado2 = obtenerValoresPorEncabezado(sheet2, encabezadoTest);
 
             for (String encabezado : encabezados) {
                 System.out.println("Encabezado: " + encabezado);
@@ -37,23 +47,29 @@ public class Lectura {
                 System.out.println("EncabezadoTest: " + encabezado);
             }
 
-            List<String> sheetNames1 = obtenerNombresDeHojas(excelFile.toString());
+            for (String encabezado : encabezados) {
+                List<String> valores = valoresPorEncabezado1.get(encabezado);
+                System.out.println("Encabezado: " + encabezado);
+                for (String valor : valores) {
+                    System.out.println("  Valor: " + valor);
+                }
+            }
+
+            /*List<String> sheetNames1 = obtenerNombresDeHojas(file1);
             List<String> headers1 = null;
 
-            List<String> sheetNames2 = obtenerNombresDeHojas(excelFile2.toString(), 3);
+            List<String> sheetNames2 = obtenerNombresDeHojas(file2, 3);
             List<String> headers2 = null;
 
             for (String sheetName1 : sheetNames1) {
+                headers1 = obtenerEncabezados(file1, sheetName1);
                 for (String sheetName2 : sheetNames2) {
                     System.out.println("SheetNames1: " + sheetName1 + "\nSheetNames2: " + sheetName2);
-                    headers1 = obtenerEncabezados(excelFile.toString(), sheetName1);
-                    headers2 = obtenerEncabezados(excelFile2.toString(), sheetName2);
 
-
-
-
+                    headers2 = obtenerEncabezados(file2, sheetName2);
+                    System.out.println("Headers1: " + headers1 + "\n Headers2: " + headers2);
                 }
-            }
+            }*/
 
             workbook.close();
             workbook2.close();
