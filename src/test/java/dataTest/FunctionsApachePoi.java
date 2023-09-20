@@ -34,6 +34,7 @@ public class FunctionsApachePoi {
                     if (cell != null) {
                         if (cell.getCellType() == CellType.STRING) {
                             value = cell.getStringCellValue();
+                            break;
                         } else if (cell.getCellType() == CellType.NUMERIC) {
                             value = String.valueOf(cell.getNumericCellValue());
                         }
