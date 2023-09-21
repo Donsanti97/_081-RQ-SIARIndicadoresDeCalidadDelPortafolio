@@ -127,7 +127,6 @@ public class FunctionsApachePoi {
             pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 2, "Suma de Cantidad");//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
 
 
-
             //Guardar excel
             FileOutputStream fileout = new FileOutputStream(file1);
             workbook.write(fileout);
@@ -450,9 +449,9 @@ public class FunctionsApachePoi {
     }
 
     //Método que elimina un archivo excel existente
-    public static void eliminarExcel(String filepath, int waitSeconds){
+    public static void eliminarExcel(String filepath, int waitSeconds) {
         File tempFile = new File(filepath);
-        int seconds = waitSeconds*1000;
+        int seconds = waitSeconds * 1000;
 
         if (tempFile.exists()) {
             try {
@@ -475,7 +474,7 @@ public class FunctionsApachePoi {
 
     }
 
-/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
     public static List<String> obtenerEncabezados(Sheet sheet) {
         List<String> encabezados = new ArrayList<>();
 
@@ -515,6 +514,7 @@ public class FunctionsApachePoi {
         }
         return sheetNames;
     }
+
     public static List<String> obtenerEncabezados(Sheet sheet, int index) {
         List<String> encabezados = new ArrayList<>();
 
@@ -574,6 +574,7 @@ public class FunctionsApachePoi {
         }
         return false;
     }
+
     /*-----------------------------------------------------------------------------------------*/
     public static List<String> buscarValorEnColumna(Sheet sheet, int columnaBuscada, String valorBuscado) {
         Iterator<Row> rowIterator = sheet.iterator();
