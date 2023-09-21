@@ -62,6 +62,41 @@ public class MethotsAzureMasterFiles {
         return shetNames;
     }
 
+    public static List<Map<String, String>> getValuebyHeader(String excelFilePath, String sheetName) {
+        List<Map<String, String>> data = new ArrayList<>();
+        List<String> headers = getHeaders(excelFilePath, sheetName);
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            for (int rowIndex = 1; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Map<String, String> rowData = new HashMap<>();
+                for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                    Cell cell = row.getCell(cellIndex);
+                    String header = headers.get(cellIndex);
+                    String value = "";
+                    if (cell != null) {
+                        if (cell.getCellType() == CellType.STRING) {
+                            value = cell.getStringCellValue();
+                            break;
+                        } else if (cell.getCellType() == CellType.NUMERIC) {
+                            value = String.valueOf(cell.getNumericCellValue());
+                        }
+                    }
+                    rowData.put(header, value);
+                }
+                data.add(rowData);
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
     public static List<String> getHeaders(String excelFilePath, String sheetName) {
         List<String> headers = new ArrayList<>();
         try {
@@ -102,6 +137,21 @@ public class MethotsAzureMasterFiles {
         return encabezados;
     }
 
+    public static List<String> findValueInColumn(Sheet sheet, int columnaBuscada, String valorBuscado) {
+        Iterator<Row> rowIterator = sheet.iterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Cell cell = row.getCell(columnaBuscada);
+            String valorCelda = obtenerValorCelda(cell);
+
+            if (valorBuscado.equals(valorCelda)) {
+                return obtenerValoresFila(row);
+            }
+        }
+
+        return null; // Valor no encontrado en la columna especificada
+    }
+
     public static List<String> getHeadersMasterfile(Sheet sheet1, Sheet sheet2) throws IOException {
         List<String> headers1 = getHeaders(sheet1);
         String headerFirstFile1 = headers1.get(0);
@@ -109,13 +159,13 @@ public class MethotsAzureMasterFiles {
         String headerSecondFile = headers2.get(0);
 
         if (!headerFirstFile1.equals(headerSecondFile)) {
-            headers2 = FunctionsApachePoi.buscarValorEnColumna(sheet1, 0, headers1.get(0));
+            headers2 = findValueInColumn(sheet1, 0, headers1.get(0));
         }
 
         return headers2;
     }
 
-        public static List<String> obtenerValoresFila(Row row) {
+    public static List<String> obtenerValoresFila(Row row) {
         List<String> valoresFila = new ArrayList<>();
         Iterator<Cell> cellIterator = row.cellIterator();
         while (cellIterator.hasNext()) {
@@ -151,6 +201,7 @@ public class MethotsAzureMasterFiles {
         }
         return valor;
     }
+
     public static String evaluarFormula(Cell cell) {
         try {
             Workbook workbook = cell.getSheet().getWorkbook();
@@ -188,6 +239,44 @@ public class MethotsAzureMasterFiles {
         return valoresPorFilas;
     }
 
+    public static Map<String, String> obtenerValoresPorEncabezado(Sheet sheet, String encabezadoCodCiudad, String encabezadoFecha) {
+        Map<String, String> valoresPorCodCiudad = new HashMap<>();
+
+        List<String> encabezados = obtenerValoresFila(sheet.getRow(0)); // Obtener encabezados de la primera fila
+        int columnaCodCiudad = -1;
+        int columnaFecha = -1;
+
+        // Encontrar las columnas de los encabezados específicos
+        for (int i = 0; i < encabezados.size(); i++) {
+            String encabezado = encabezados.get(i);
+            if (encabezado.equals(encabezadoCodCiudad)) {
+                columnaCodCiudad = i;
+            }
+            if (encabezado.equals(encabezadoFecha)) {
+                columnaFecha = i;
+            }
+        }
+
+        if (columnaCodCiudad == -1 || columnaFecha == -1) {
+            return valoresPorCodCiudad; // No se encontraron los encabezados especificados
+        }
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        // Omitir la primera fila ya que contiene los encabezados
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            String codCiudad = obtenerValorCelda(row.getCell(columnaCodCiudad));
+            String valorFecha = obtenerValorCelda(row.getCell(columnaFecha));
+            valoresPorCodCiudad.put(codCiudad, valorFecha);
+        }
+
+        return valoresPorCodCiudad;
+    }
+
 
     @Test
     public static void test() {
@@ -216,23 +305,15 @@ public class MethotsAzureMasterFiles {
                 //System.out.println("Headers: ");
                 for (String headers : encabezados1) {
                     //System.out.print(headers + "||");
-                    valoresEncabezados1 = FunctionsApachePoi.obtenerValoresDeEncabezados(file1, sheets);
-                    /*valoresEncabezados1 = obtenerValoresPorFilas(sheet1, encabezados1);
-                    //System.out.println(valoresEncabezados1);
-                    for (Map<String, String> map : valoresEncabezados1){
-                        System.out.println("Fila: ");
-                        for (Map.Entry<String, String> entry : map.entrySet()){
-                            System.out.println("Headers1: " + entry.getKey() + ", value: " + entry.getValue());
-                        }
-                    }*/
+                    valoresEncabezados1 = getValuebyHeader(file1, sheets);
                 }
             }
             System.out.println("------------------------------------------------------------------------------------------");
 
             valoresEncabezados1 = obtenerValoresPorFilas(sheet1, encabezados1);
-            for (Map<String, String> map : valoresEncabezados1){
+            for (Map<String, String> map : valoresEncabezados1) {
                 System.out.println("Fila: ");
-                for (Map.Entry<String, String> entry : map.entrySet()){
+                for (Map.Entry<String, String> entry : map.entrySet()) {
                     System.out.println("Headers1: " + entry.getKey() + ", value: " + entry.getValue());
                 }
             }
@@ -248,24 +329,23 @@ public class MethotsAzureMasterFiles {
 
             System.out.println("-------------------------------------------------------------------------------------");
             valoresEncabezados2 = obtenerValoresPorFilas(sheet2, encabezados2);
-            for (Map<String, String> map : valoresEncabezados2){
+            for (Map<String, String> map : valoresEncabezados2) {
                 System.out.println("Fila2: ");
-                for (Map.Entry<String, String> entry : map.entrySet()){
+                for (Map.Entry<String, String> entry : map.entrySet()) {
                     System.out.println("Headers2: " + entry.getKey() + ", Value: " + entry.getValue());
                 }
             }
 
             System.out.println("---------------------------------------------------------------------------------------");
-            for (String e1 : encabezados1){
-                for (String e2: encabezados2){
-                    if (e1.equals(e2)){
+            for (String e1 : encabezados1) {
+                for (String e2 : encabezados2) {
+                    if (e1.equals(e2)) {
                         System.out.println("equals");
-                    }else {
+                    } else {
                         System.out.println("No equals");
                     }
                 }
             }
-
 
 
         } catch (FileNotFoundException e) {
