@@ -1,6 +1,6 @@
 package dataTest;
 
-import com.aspose.cells.*;
+//import com.aspose.cells.*;
 import org.testng.annotations.Test;
 
 
@@ -41,8 +41,8 @@ public class DataTest {
         return input.toLowerCase();
     }
 
-    @Test(description = "Consulta de campos tipo String")
-    public static void consultaDatos() {
+    //@Test(description = "Consulta de campos tipo String")
+    /*public static void consultaDatos() {
         try {
 
 
@@ -80,7 +80,7 @@ public class DataTest {
 
             for (int sheetIndex1 = 0; sheetIndex1 < workbook1.getWorksheets().getCount(); sheetIndex1++) {
                 String name1 = workbook1.getWorksheets().get(sheetIndex1).getName();
-                String newName1 = name1/*.replaceAll("\\s", "")*/.replaceAll("(\\d)a(\\d)", "$1$2").replaceAll("_", "").replaceAll("Mas", ">").replaceAll("MenIgu", "<=");
+                String newName1 = name1.replaceAll("\\s", "").replaceAll("(\\d)a(\\d)", "$1$2").replaceAll("_", "").replaceAll("Mas", ">").replaceAll("MenIgu", "<=");
                 String finalName1 = convertToAsciiAndSort(newName1);
                 System.out.println(finalName1);
 
@@ -162,7 +162,7 @@ public class DataTest {
 
                             }
 
-                            //System.out.print("Cell1: " + cell1.getValue()/*getDisplayStringValue()*/ + " | ");
+                            //System.out.print("Cell1: " + cell1.getValue() + " | ");
                             //System.out.print("Cell2: " + cell2.getDisplayStringValue() + "|\n");
                         }
                     }
@@ -172,7 +172,7 @@ public class DataTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
     /**
      * @Description: Este método verifica las coinsidencias de los nombres de las hojas de trabajo en dos archivos Excel
@@ -181,7 +181,7 @@ public class DataTest {
      * @author Mairon Martinez
      * @since 28/08/2023
     **/
-    public static boolean equalName(Workbook workbook1, Workbook workbook2){
+    /*public static boolean equalName(Workbook workbook1, Workbook workbook2){
         Set<String> sheetNames1 = new HashSet<>();
         Set<String> duplicateSheetNames = new HashSet<>();
 
@@ -217,7 +217,7 @@ public class DataTest {
             return false;
         }
         return true;
-    }
+    }*/
 
     /**
      * @Description: Este método obtiene información de un archivo excel
@@ -227,7 +227,7 @@ public class DataTest {
      * @since 28/08/2023
      *
     **/
-    public static String getInformation(String fileName) throws Exception {
+    /*public static String getInformation(String fileName) throws Exception {
 
         String string = "Valiste berenjena";
 
@@ -252,14 +252,14 @@ public class DataTest {
                         System.out.println(worksheet.getCells().get(176, 3).getDisplayStringValue() + "||");
                         string = worksheet.getCells().get(176, 3).getDisplayStringValue() + "||";
                         return string;
-                        /*if (worksheet.getCells().get(176, 8).isNumericValue()){
+                        *//*if (worksheet.getCells().get(176, 8).isNumericValue()){
                             System.out.println("Es un numero pape");
                             return string;
                         }else if (!worksheet.getCells().get(176, 8).isNumericValue()){
                             System.out.println(worksheet.getCells().get(176, 8).getDisplayStringValue() + "||");
                             string = worksheet.getCells().get(176, 8).getDisplayStringValue() + "||";
                             return string;
-                        }*/
+                        }*//*
                     }
                 }
                 System.out.println(" ");
@@ -268,7 +268,7 @@ public class DataTest {
 
 
         return string;
-    }
+    }*/
 
 
 }
