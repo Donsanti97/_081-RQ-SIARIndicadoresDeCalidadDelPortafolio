@@ -51,19 +51,76 @@ public class FunctionsApachePoi {
         return data;
     }
 
+    public static void convertirExcel(String archivo) throws IOException {
+        FileInputStream fis = new FileInputStream(archivo);
+        Workbook workbook = new XSSFWorkbook(fis);
+
+        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            Sheet sheet = workbook.getSheetAt(i);
+
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING) {
+                        try {
+                            double valorNumerico = Double.parseDouble(cell.getStringCellValue());
+                            // Si se puede convertir a número, establece el valor numérico
+                            cell.setCellValue(valorNumerico);
+                        } catch (NumberFormatException e) {
+                            // No se pudo convertir a número, no hacemos nada
+                        }
+                    }
+                }
+            }
+        }
+
+        fis.close();
+
+        // Guardar el archivo Excel con los valores convertidos
+        FileOutputStream fos = new FileOutputStream(archivo);
+        workbook.write(fos);
+        fos.close();
+
+        workbook.close();
+    }
+
+    //@Test
     //Metodo para creación de tablas dinámicas
-    public static void tablasDinamicasApachePoi(/*String filepath, String hoja, String*/) throws IOException {
-        String file1 = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx";//OKCARTERA.20230426
-        String sName = "Hoja1";
+    public static void tablasDinamicasApachePoi(String filePath, String codSucursal, String colValores) throws IOException {
+        //String filePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx";//OKCARTERA.20230426
 
         try {
             IOUtils.setByteArrayMaxOverride(300000000);
 
-            InputStream fileInputStream = new FileInputStream(file1);
+            convertirExcel(filePath);
+
+            InputStream fileInputStream = new FileInputStream(filePath);
             Workbook workbook = new XSSFWorkbook(fileInputStream);
 
             //Definir hoja
-            Sheet sheet = workbook.getSheet(sName);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            //String codSucursal = "producto";//codigo_sucursal
+            //String colValores = "cantidad";//capital
+
+            List<String> headers = obtenerEncabezados(filePath, sheet.getSheetName());
+            int index = 0;
+            int index2 = 0;
+            for (int i = 0; i < headers.size(); i++) {
+                String header = headers.get(i);
+                if(header.contains(codSucursal)){
+                    index = i;
+                    System.out.println("Index1: " + index);
+                }
+            }
+            for (int i = 0; i < headers.size(); i++) {
+                String header = headers.get(i);
+                if(header.contains(colValores)){
+                    index2 = i;
+                    System.out.println("Index1: " + index2);
+
+                }
+            }
+
 
             //Generar el area de los datos
             CellReference topLeft = new CellReference(sheet.getFirstRowNum(), sheet.getRow(sheet.getFirstRowNum()).getFirstCellNum());
@@ -74,61 +131,14 @@ public class FunctionsApachePoi {
 
             CellReference pivotCellReference = new CellReference(2, bottomRight.getCol() + 2);
 
-
-            int startColIndex = pivotCellReference.getCol();
-            int endColIndex = startColIndex + 1;
-            // Eliminar las columnas donde se creó la tabla dinámica
-            for (int i = endColIndex; i >= startColIndex; i--) {
-                for (Row row : sheet) {
-                    Cell cell = row.getCell(i);
-                    if (cell != null) {
-                        row.removeCell(cell);
-                    }
-                }
-            }
-            /*XSSFSheet xssfSheet = (XSSFSheet) sheet;
-            for (XSSFPivotTable pivotTable : xssfSheet.getPivotTables()) {
-                // Obtiene la celda de inicio de la tabla dinámica
-                CellReference topLeftCell = pivotTable.getCTPivotTableDefinition().getRef();
-                int firstRow = topLeftCell.getRow();
-                int firstCol = topLeftCell.getCol();
-
-                // Obtiene la celda de fin de la tabla dinámica
-                int lastRow = firstRow + pivotTable.getRowCount();
-                int lastCol = firstCol + pivotTable.getColCount();
-
-                // Imprime el rango de celdas de la tabla dinámica
-                System.out.println("Rango de la tabla dinámica:");
-                System.out.println("Desde: " + new CellReference(firstRow, firstCol));
-                System.out.println("Hasta: " + new CellReference(lastRow - 1, lastCol - 1));
-            }*/
-
-            // Buscar y eliminar cualquier tabla dinámica existente en la hoja de cálculo
-            /*XSSFSheet xssfSheet = (XSSFSheet) sheet;
-            List<XSSFPivotTable> pivotTables = xssfSheet.getPivotTables();
-            if (!pivotTables.isEmpty()) {
-                for (XSSFPivotTable pivotTable1 : pivotTables) {
-                    System.out.println(pivotTable1.toString() + "----------");
-                    // Eliminar las columnas donde se creó la tabla dinámica
-                    for (int i = endColIndex; i >= startColIndex; i--) {
-                        for (Row row : sheet) {
-                            Cell cell = row.getCell(i);
-                            if (cell != null) {
-                                row.removeCell(cell);
-                            }
-                        }
-                    }
-                }
-            }*/
-
             //Crea la tabla dinamica en la hoja de trabajo
             XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, pivotCellReference);//DW12
-            pivotTable.addRowLabel(0);//Agregar etiqueta de fila para el campo Modalidad (12)
-            pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 2, "Suma de Cantidad");//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
+            pivotTable.addRowLabel(index);//Agregar etiqueta de fila para el campo Modalidad (12)
+            pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
 
 
             //Guardar excel
-            FileOutputStream fileout = new FileOutputStream(file1);
+            FileOutputStream fileout = new FileOutputStream(filePath);
             workbook.write(fileout);
             fileout.close();
 
@@ -365,7 +375,7 @@ public class FunctionsApachePoi {
     }
 
     //Método para obtener valores de los encabezados de un rango específico cada uno, el primero rango String y el segundo rango double
-    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, String valorInicio1, String valorFin1, String campoFiltrar2, double valorInicio2, double valorFin2) {
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, String valorInicio1, String valorFin1, String campoFiltrar2, int valorInicio2, int valorFin2) {
         List<Map<String, String>> datosFiltrados = new ArrayList<>();
         try {
             FileInputStream fis = new FileInputStream(excelFilePath);
@@ -400,6 +410,7 @@ public class FunctionsApachePoi {
                                 value = String.valueOf(dataCell.getNumericCellValue());
                             }
                         }
+
                         rowData.put(header, value);
                     }
                     datosFiltrados.add(rowData);
