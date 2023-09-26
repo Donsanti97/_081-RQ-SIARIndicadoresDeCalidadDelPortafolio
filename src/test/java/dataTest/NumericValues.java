@@ -1,9 +1,13 @@
 package dataTest;
 
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -14,15 +18,47 @@ import static dataTest.FunctionsApachePoi.*;
 
 public class NumericValues {
 
+    public static void runtime() {
+        Runtime runtime = Runtime.getRuntime();
+        long minRunningMemory = (1024 * 1024);
+        if (runtime.freeMemory() < minRunningMemory) {
+            System.gc();
+        }
+    }
+
+    @Test
+    public static void algo() {
+        String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
+        String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
+
+        IOUtils.setByteArrayMaxOverride(300000000);
+        System.out.println("URL " + excelFilePathTest);
+
+        try {
+            /*FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheetAt(0);
+            String sheetN = sheet.getSheetName();
+            System.out.println(sheetN);*/
+            List<String> sheetNames = obtenerNombresDeHojas(excelFilePath);
+            for (String sheetName : sheetNames) {
+                System.out.println(sheetName);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     @Test
     public static void findFields() throws IOException {
 
         String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
-        String excelFilePathTest = System.getProperty("user.dir") + File.separator + "documents\\procesedDocuments" + File.separator + "TestData.xlsx";
+        String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
 
         IOUtils.setByteArrayMaxOverride(300000000);
 
-        List<String> sheetNames = obtenerNombresDeHojas(excelFilePathTest);
+        List<String> sheetNames = obtenerNombresDeHojas(excelFilePath);
 
         List<String> headers = null;
         List<Map<String, String>> datosFiltrados = null;
@@ -58,6 +94,7 @@ public class NumericValues {
                 }
                 System.out.println();
             }
+            runtime();
 
             System.out.println("----------------------");
         }
@@ -70,17 +107,16 @@ public class NumericValues {
 
         sheetNames = obtenerNombresDeHojas(nuevaHojaFilePath);
 
-        for (String sheetName : sheetNames ){
+        for (String sheetName : sheetNames) {
             System.out.println("Contenido de la hoja: " + sheetName);
 
             headers = obtenerEncabezados(nuevaHojaFilePath, sheetName);
 
             System.out.println("Campos disponibles " + headers);
 
-            for (String header : headers){
+            for (String header : headers) {
                 System.out.println(header);
             }
-
 
 
             List<String> camposDeseados = Arrays.asList("codigo_sucursal", "capital");
@@ -96,19 +132,19 @@ public class NumericValues {
             }
 
             System.out.println("----------------------");
+            runtime();
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-
+            runtime();
 
 
         }
 
 
-
     }
 
     @Test
-    public static void deleteTempFile(){
+    public static void deleteTempFile() {
         eliminarExcel(System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx", 5);
     }
 
