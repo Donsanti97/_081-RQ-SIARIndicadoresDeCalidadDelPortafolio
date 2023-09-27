@@ -65,6 +65,48 @@ public class MethotsAzureMasterFiles {
             return null; // Si no se seleccionó ningún archivo, retorna null
         }
     }
+
+    /*-------------------------------------------------------------------------------------------------------------------------------*/
+    public static int findSheetIndexInExcelB(String excelAFilePath, String excelBFilePath, String targetSheetName) throws IOException {
+        FileInputStream excelAFile = new FileInputStream(excelAFilePath);
+        FileInputStream excelBFile = new FileInputStream(excelBFilePath);
+
+        Workbook workbookA = new XSSFWorkbook(excelAFile);
+        Workbook workbookB = new XSSFWorkbook(excelBFile);
+
+        int sheetIndexInB = -1;
+
+        for (int i = 0; i < workbookB.getNumberOfSheets(); i++) {
+            if (workbookB.getSheetName(i).equals(targetSheetName)) {
+                sheetIndexInB = i;
+                break;
+            }
+        }
+
+        List<String> removedSheetNames = new ArrayList<>();
+
+        if (sheetIndexInB != -1) {
+            // Elimina las hojas anteriores a la hoja objetivo en Excel B
+            for (int i = 0; i < sheetIndexInB; i++) {
+                String sheetNameToRemove = workbookB.getSheetName(i);
+                removedSheetNames.add(sheetNameToRemove);
+            }
+        }
+
+        // Cerrar los archivos
+        excelAFile.close();
+        excelBFile.close();
+
+        return sheetIndexInB;
+    }
+
+    public static void runtime() {
+        Runtime runtime = Runtime.getRuntime();
+        long minRunningMemory = (1024 * 1024);
+        if (runtime.freeMemory() < minRunningMemory) {
+            System.gc();
+        }
+    }
     /*---------------------------------------------------------------------------------------------------------------*/
 
     public static List<String> getWorkSheet(String filePath, int i) {

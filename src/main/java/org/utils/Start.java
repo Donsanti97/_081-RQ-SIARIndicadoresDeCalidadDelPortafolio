@@ -19,7 +19,6 @@ import java.util.Map;
 import static org.utils.MethotsAzureMasterFiles.*;
 
 public class Start {
-
     public void start(){
         //MethotsAzureMasterFiles readFiles = new MethotsAzureMasterFiles();
         System.out.println("\n" +
@@ -34,9 +33,10 @@ public class Start {
         try {
             //Ponemos a "Dormir" el programa 5sg
             Thread.sleep(5*1000);
-            System.out.println("Generando primer archivo...");
+            System.out.println("Generando analisis...");
             System.console();
             excecution();
+            runtime();
         } catch (Exception e) { System.out.println(e); }
     }
 
@@ -65,15 +65,36 @@ public class Start {
                 System.out.println("No se seleccionó ningún archivo.");
             }
 
+
+
+
             FileInputStream fis = new FileInputStream(file1);
             Workbook workbook = new XSSFWorkbook(fis);
             FileInputStream fis2 = new FileInputStream(file2);
             Workbook workbook2 = new XSSFWorkbook(fis2);
             Sheet sheet1 = workbook.getSheetAt(0);
-            Sheet sheet2 = workbook2.getSheetAt(3);
 
+            int indexF2 = 0;
             List<String> nameSheets1 = getWorkSheet(file1, 0);
-            List<String> nameSheets2 = getWorkSheet(file2, 3);
+            Sheet sheet2 = workbook2.getSheetAt(0);
+            List<String> nameSheets2 = getWorkSheet(file2, 0);
+
+                for (String s2 : nameSheets2) {
+                    String sheetname = s2.replaceAll("\\s", "");
+                    for (int i = 0; i < workbook2.getNumberOfSheets(); i++) {
+                        if (nameSheets1.get(0).equals(sheetname)){
+                            indexF2 = i;
+                            System.out.println("La hoja de trabajo se encontró en Excel B en el índice: " + indexF2);
+                            break;
+                    }else {
+                            System.out.println("Analizando...");
+                            break;
+                        }
+                }
+            }
+
+                sheet2 = workbook2.getSheetAt(indexF2);
+                nameSheets2 = getWorkSheet(file2, indexF2);
 
             List<String> encabezados1 = null;
             List<String> encabezados2 = null;

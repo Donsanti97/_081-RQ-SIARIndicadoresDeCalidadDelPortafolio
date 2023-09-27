@@ -28,21 +28,38 @@ public class NumericValues {
 
     @Test
     public static void algo() {
-        String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
+        String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleOfTheMiddleTestData.xlsx";
         String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
 
         IOUtils.setByteArrayMaxOverride(300000000);
         System.out.println("URL " + excelFilePathTest);
 
         try {
-            /*FileInputStream fis = new FileInputStream(excelFilePath);
-            Workbook workbook = new XSSFWorkbook(fis);
-            Sheet sheet = workbook.getSheetAt(0);
-            String sheetN = sheet.getSheetName();
-            System.out.println(sheetN);*/
-            List<String> sheetNames = obtenerNombresDeHojas(excelFilePath);
+            List<String> sheetNames = obtenerNombresDeHojas(excelFilePathTest);
             for (String sheetName : sheetNames) {
                 System.out.println(sheetName);
+
+                List<String> headers = obtenerEncabezados(excelFilePathTest, sheetName);
+                for (String header : headers){
+                    System.out.println(header);
+                    runtime();
+                }
+                List<String> campos =Arrays.asList("modalidad", "codigo_sucursal");
+
+
+                List<Map<String, String>> datos = obtenerValoresDeEncabezados(excelFilePathTest, sheetName, "modalidad", "COMERCIAL", "COMERCIAL");
+                runtime();
+
+                for (Map<String, String> rowData : datos) {
+                        for (String campoDeseado : campos) {
+                            String valorCampo = rowData.get(campoDeseado);
+
+                            System.out.println(campoDeseado + ": " + valorCampo);
+                        }
+                        System.out.println();
+                        runtime();
+
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -54,7 +71,7 @@ public class NumericValues {
     public static void findFields() throws IOException {
 
         String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
-        String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TestData.xlsx";
+        String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleOfTheMiddleTestData.xlsx";
 
         IOUtils.setByteArrayMaxOverride(300000000);
 
@@ -87,7 +104,6 @@ public class NumericValues {
             System.out.println("Datos filtrados por " + campoFiltrar + " en el rango [" + valorInicio + ", " + valorFin + "]");
             for (Map<String, String> rowData : datosFiltrados) {
                 for (String campoDeseado : camposDeseados) {
-                    //Object value = nS(campoDeseado);
                     String valorCampo = rowData.get(campoDeseado);
 
                     System.out.println(campoDeseado + ": " + valorCampo);
@@ -132,7 +148,6 @@ public class NumericValues {
             }
 
             System.out.println("----------------------");
-            runtime();
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
             runtime();
