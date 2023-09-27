@@ -6,13 +6,20 @@ import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFPivotTable;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.testng.annotations.Test;
 import org.apache.poi.util.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
 
 public class FunctionsApachePoi {
+
+
+    private static final Logger logger = LogManager.getLogger(FunctionsApachePoi.class);
+
+
 
 
     //Metodo para obtener los valores de encabezados generales
@@ -46,7 +53,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);;
         }
         return data;
     }
@@ -149,7 +156,7 @@ public class FunctionsApachePoi {
 
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error("Error al procesar el archivo Excel", e);
         }
 
 
@@ -159,6 +166,8 @@ public class FunctionsApachePoi {
     public static List<String> obtenerNombresDeHojas(String excelFilePath) {
         List<String> sheetNames = new ArrayList<>();
         try {
+            IOUtils.setByteArrayMaxOverride(300000000);
+
             FileInputStream fis = new FileInputStream(excelFilePath);
             Workbook workbook = new XSSFWorkbook(fis);
             int numberOfSheets = workbook.getNumberOfSheets();
@@ -169,7 +178,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return sheetNames;
     }
@@ -179,6 +188,7 @@ public class FunctionsApachePoi {
     public static List<String> obtenerEncabezados(String excelFilePath, String sheetName) {
         List<String> headers = new ArrayList<>();
         try {
+            IOUtils.setByteArrayMaxOverride(300000000);
             FileInputStream fis = new FileInputStream(excelFilePath);
             Workbook workbook = new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheet(sheetName);
@@ -189,7 +199,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return headers;
     }
@@ -226,7 +236,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return data;
     }
@@ -271,7 +281,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return datosFiltrados;
     }
@@ -320,7 +330,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return datosFiltrados;
     }
@@ -369,7 +379,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return datosFiltrados;
     }
@@ -377,11 +387,14 @@ public class FunctionsApachePoi {
     //Método para obtener valores de los encabezados de un rango específico cada uno, el primero rango String y el segundo rango double
     public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, String valorInicio1, String valorFin1, String campoFiltrar2, int valorInicio2, int valorFin2) {
         List<Map<String, String>> datosFiltrados = new ArrayList<>();
+        List<String> headers = null;
         try {
+            IOUtils.setByteArrayMaxOverride(300000000);
+
             FileInputStream fis = new FileInputStream(excelFilePath);
             Workbook workbook = new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheet(sheetName);
-            List<String> headers = obtenerEncabezados(excelFilePath, sheetName);
+            headers = obtenerEncabezados(excelFilePath, sheetName);
             int campoFiltrarIndex1 = headers.indexOf(campoFiltrar1);
             int campoFiltrarIndex2 = headers.indexOf(campoFiltrar2);
             if (campoFiltrarIndex1 == -1 || campoFiltrarIndex2 == -1) {
@@ -419,7 +432,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return datosFiltrados;
     }
@@ -455,7 +468,7 @@ public class FunctionsApachePoi {
             fos.close();
             workbook.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
     }
 
@@ -521,7 +534,7 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al procesar el archivo Excel", e);
         }
         return sheetNames;
     }
