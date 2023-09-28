@@ -1,5 +1,6 @@
 package org.utils;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -13,8 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.utils.MethotsAzureMasterFiles.*;
 
@@ -102,6 +102,55 @@ public class Start {
             List<Map<String, String>> valoresEncabezados1 = null;
             List<Map<String, String>> valoresEncabezados2 = null;
 
+            System.out.println("--------------------------------------------------------------------------------------------------");
+            System.out.println("Aquí comienza el análisis de hojas iguales");
+            LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+            List<String> duplicateSheetNames = new ArrayList<>();
+            for (String sn1 : nameSheets1) {
+                for (String sn2 : nameSheets2) {
+                    if (!sn1.equals(sn2)) {
+                        //System.out.println("equals: " + sn1 + ", " + sn2);
+                        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                            String s1 = nameSheets1.get(i);
+                            String sheets1 = s1.replaceAll("(\\d)a(\\d)", "-").replaceAll("Mas", ">").
+                                    replaceAll("MenIgu", "<=").replaceAll("N", "N°").toLowerCase();
+                            String finalName1 = convertToAsciiAndSort(sheets1);
+                            System.out.println("Replaced sheets1: " + finalName1);
+
+                            for (int j = 0; j < workbook2.getNumberOfSheets(); j++) {
+                                String s2 = nameSheets2.get(j);
+                                String sheets2 = s2.replaceAll("[^\\p{ASCII}]", "").replaceAll("\\s", "").toLowerCase();
+
+                                String finalName2 = convertToAsciiAndSort(sheets2);
+                                System.out.println("Replaced sheets2: " + finalName2);
+                                double similarity = calculateSimilarity(finalName1, finalName2, levenshteinDistance);
+
+                                if (similarity >= 1.0) { // Cambia este valor según la similitud deseada (Medida ideal, toma TODAS las hojas)
+                                    System.out.println("Similarity " + similarity + ", Final names " + s1 + ", " + s2);
+                                    duplicateSheetNames.add(s1);
+                                    duplicateSheetNames.add(s2);
+                                }
+                            }
+                        }
+                    }else {
+                        duplicateSheetNames.add(sn1);
+                        duplicateSheetNames.add(sn2);
+                    }
+                }
+            }
+
+            if (!duplicateSheetNames.isEmpty()) {
+                System.out.println("Las siguientes hojas tienen nombres similares en ambos archivos:");
+                for (String name : duplicateSheetNames) {
+                    System.out.println(name);
+                }
+            } else {
+                System.out.println("No se encontraron hojas con nombres similares en ambos archivos.");
+            }
+
+
+            System.out.println("-----------------------------------------------------------------------------------------------------------");
+
             System.out.println("Analizando archivo Azure");
             for (String sheets : nameSheets1) {
                 System.out.print("Analizando: ");
@@ -113,6 +162,8 @@ public class Start {
                     valoresEncabezados1 = getValuebyHeader(file1, sheets);
                 }
             }
+
+
             System.out.println("------------------------------------------------------------------------------------------");
 
             valoresEncabezados1 = obtenerValoresPorFilas(sheet1, encabezados1);
@@ -143,15 +194,7 @@ public class Start {
             }
 
             System.out.println("---------------------------------------------------------------------------------------");
-            /*for (String e1 : encabezados1) {
-                for (String e2 : encabezados2) {
-                    if (e1.equals(e2)) {
-                        System.out.println("equals" + e1 + ", " + e2);
-                    } else {
-                        System.out.println("No equals");
-                    }
-                }
-            }*/
+
             System.out.println("Analisis completado...");
             workbook.close();
             workbook2.close();
@@ -159,7 +202,7 @@ public class Start {
             fis2.close();
 
 
-            moveDocument(file2, destino);
+            //moveDocument(file2, destino);
 
             JOptionPane.showMessageDialog(null, "Archivos analizados correctamente sin errores");
 

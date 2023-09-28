@@ -1,5 +1,6 @@
 package org.utils;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -106,6 +107,28 @@ public class MethotsAzureMasterFiles {
         if (runtime.freeMemory() < minRunningMemory) {
             System.gc();
         }
+    }
+
+    public static String convertToAsciiAndSort(String input) {
+        //String input = convertToLowerCase(input);
+        int[] asciiValues = new int[input.length()];
+        for (int i = 0; i < input.length(); i++) {
+            asciiValues[i] = input.charAt(i); // Obtener el valor ASCII de cada carácter
+        }
+
+        Arrays.sort(asciiValues); // Ordenar de menor a mayor (valores ASCII)
+
+        StringBuilder result = new StringBuilder();
+        for (int value : asciiValues) {
+            result.append((char) value); // Convertir el valor ASCII de nuevo a carácter
+        }
+
+        return result.toString();
+    }
+
+    static double calculateSimilarity(String str1, String str2, LevenshteinDistance distance) {
+        int maxLen = Math.max(str1.length(), str2.length());
+        return 1.0 - (double) distance.apply(str1, str2) / maxLen;
     }
     /*---------------------------------------------------------------------------------------------------------------*/
 
