@@ -106,7 +106,7 @@ public class Start {
             for (String sheets : nameSheets1) {
                 System.out.print("Analizando: ");
                 System.out.println(sheets);
-                encabezados1 = getHeaders(file1, "CER150");
+                encabezados1 = getHeaders(file1, sheets);
                 //System.out.println("Headers: ");
                 for (String headers : encabezados1) {
                     //System.out.print(headers + "||");
