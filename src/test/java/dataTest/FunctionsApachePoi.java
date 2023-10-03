@@ -1,5 +1,6 @@
 package dataTest;
 
+import org.apache.poi.ss.format.CellFormatType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
@@ -93,7 +94,7 @@ public class FunctionsApachePoi {
 
     //@Test
     //Metodo para creación de tablas dinámicas
-    public static void tablasDinamicasApachePoi(String filePath, String codSucursal, String colValores) throws IOException {
+    public static void tablasDinamicasApachePoi(String filePath, String codSucursal, String colValores, String funcion) throws IOException {
         //String filePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx";//OKCARTERA.20230426
 
         try {
@@ -137,13 +138,23 @@ public class FunctionsApachePoi {
             System.out.println(source);
 
 
-            CellReference pivotCellReference = new CellReference(2, bottomRight.getCol() + 2);
+            CellReference pivotCellReference = new CellReference(2, bottomRight.getCol() + 3);
 
             //Crea la tabla dinamica en la hoja de trabajo
             XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, pivotCellReference);//DW12
             pivotTable.addRowLabel(index);//Agregar etiqueta de fila para el campo Modalidad (12)
-            pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
+            //pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
 
+
+
+            switch (funcion.toLowerCase()){
+                case "suma":
+                    pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
+                    break;
+                case "recuento":
+                    pivotTable.addColumnLabel(DataConsolidateFunction.COUNT, index2, "Recuento de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
+
+            }
 
 
             //Guardar excel
@@ -164,12 +175,28 @@ public class FunctionsApachePoi {
         }
     }
 
+    public static void runtime() {
+        Runtime runtime = Runtime.getRuntime();
+        long minRunningMemory = (1024 * 1024);
+        if (runtime.freeMemory() < minRunningMemory) {
+            System.gc();
+        }
+    }
+    public static void waitSeconds(int seconds){
+        try {
+            Thread.sleep((seconds * 1000L));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Map<String, Integer> extractPivotTableData(String filePath, String filterColumnName, String valueColumnName) throws IOException {
         FileInputStream fis = new FileInputStream(filePath);
         Workbook workbook = new XSSFWorkbook(fis);
         Sheet sheet = workbook.getSheetAt(0);
+        System.out.println("Hoja: " + sheet.getSheetName());
         List<XSSFTable> tables = ((XSSFSheet) sheet).getTables();
-
+        System.out.println("Tablas: " + ((XSSFSheet) sheet).getTables().get(0).toString());
         if (tables.isEmpty()) {
             throw new IllegalArgumentException("No se encontraron tablas dinámicas en la hoja de trabajo.");
         }
@@ -386,6 +413,8 @@ public class FunctionsApachePoi {
                                 value = dataCell.getStringCellValue();
                             } else if (dataCell.getCellType() == CellType.NUMERIC) {
                                 value = String.valueOf(dataCell.getNumericCellValue());
+                            } else if (dataCell.getCellType() == CellFormatType.DATE.) {
+                                
                             }
                         }
                         rowData.put(header, value);
