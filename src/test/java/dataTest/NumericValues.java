@@ -27,7 +27,7 @@ public class NumericValues {
     }
 
     @Test
-    public static void algo() {
+    public static void carteraBruta() {
         String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleOfTheMiddleTestData.xlsx";
         String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
 
@@ -35,32 +35,7 @@ public class NumericValues {
         System.out.println("URL " + excelFilePathTest);
 
         try {
-            List<String> sheetNames = obtenerNombresDeHojas(excelFilePathTest);
-            for (String sheetName : sheetNames) {
-                System.out.println(sheetName);
 
-                List<String> headers = obtenerEncabezados(excelFilePathTest, sheetName);
-                for (String header : headers){
-                    System.out.println(header);
-                    runtime();
-                }
-                List<String> campos =Arrays.asList("modalidad", "codigo_sucursal");
-
-
-                List<Map<String, String>> datos = obtenerValoresDeEncabezados(excelFilePathTest, sheetName, "modalidad", "COMERCIAL", "COMERCIAL");
-                runtime();
-
-                for (Map<String, String> rowData : datos) {
-                        for (String campoDeseado : campos) {
-                            String valorCampo = rowData.get(campoDeseado);
-
-                            System.out.println(campoDeseado + ": " + valorCampo);
-                        }
-                        System.out.println();
-                        runtime();
-
-                }
-            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -68,7 +43,7 @@ public class NumericValues {
     }
 
     @Test
-    public static void findFields() throws IOException {
+    public static void findFields(/*String excelFilePath, String campo, String rangoDe, String rando hasta*/) throws IOException {
 
         String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
         String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleTestData.xlsx";
@@ -119,7 +94,7 @@ public class NumericValues {
         String nuevaHojaFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx"; // Reemplaza con la ruta y nombre de tu nuevo archivo Excel
         crearNuevaHojaExcel(nuevaHojaFilePath, headers, datosFiltrados);
 
-        System.out.println("----------------------");
+        System.out.println("Analisis archivo temporal----------------------");
 
         sheetNames = obtenerNombresDeHojas(nuevaHojaFilePath);
 
@@ -147,11 +122,19 @@ public class NumericValues {
                 System.out.println();
             }
 
-            System.out.println("----------------------");
+            System.out.println("---------------------- CREACION TABLA DINAMICA");
+
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            runtime();
 
+
+            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
+            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
+
+            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
+                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
+            }
+            runtime();
 
         }
 

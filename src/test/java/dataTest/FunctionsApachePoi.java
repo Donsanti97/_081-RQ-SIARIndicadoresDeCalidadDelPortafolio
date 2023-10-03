@@ -5,6 +5,7 @@ import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFPivotTable;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.util.*;
 
@@ -123,7 +124,7 @@ public class FunctionsApachePoi {
                 String header = headers.get(i);
                 if(header.contains(colValores)){
                     index2 = i;
-                    System.out.println("Index1: " + index2);
+                    System.out.println("Index2: " + index2);
 
                 }
             }
@@ -144,22 +145,87 @@ public class FunctionsApachePoi {
             pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
 
 
+
             //Guardar excel
             FileOutputStream fileout = new FileOutputStream(filePath);
             workbook.write(fileout);
+            fileInputStream.close();
             fileout.close();
+
 
             //Se cierra excel
             workbook.close();
 
-            System.out.println("Tabla dinamica creada");
 
+            System.out.println("Tabla dinamica creada");
 
         } catch (IOException e) {
             logger.error("Error al procesar el archivo Excel", e);
         }
+    }
 
+    public static Map<String, Integer> extractPivotTableData(String filePath, String filterColumnName, String valueColumnName) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+        List<XSSFTable> tables = ((XSSFSheet) sheet).getTables();
 
+        if (tables.isEmpty()) {
+            throw new IllegalArgumentException("No se encontraron tablas dinámicas en la hoja de trabajo.");
+        }
+
+        XSSFTable pivotTable = tables.get(0);
+        CellReference startCell = pivotTable.getStartCellReference();
+        CellReference endCell = pivotTable.getEndCellReference();
+        int firstRow = startCell.getRow();
+        int lastRow = endCell.getRow();
+
+        Map<String, Integer> dataMap = new HashMap<>();
+
+        for (int rowNum = firstRow + 1; rowNum <= lastRow; rowNum++) {
+            Row row = sheet.getRow(rowNum);
+            Cell filterCell = row.getCell(pivotTable.findColumnIndex(filterColumnName));
+            String filterValue = filterCell.getStringCellValue();
+            Cell valueCell = row.getCell(pivotTable.findColumnIndex(valueColumnName));
+            int sumValue = (int) valueCell.getNumericCellValue();
+            dataMap.put(filterValue, sumValue);
+        }
+
+        fis.close();
+        return dataMap;
+    }
+
+    public static Map<String, Integer> processExcelFile(String filePath) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0); // Suponiendo que estás trabajando en la primera hoja del archivo
+
+        Map<String, Integer> resultMap = new HashMap<>();
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        rowIterator.next(); // Saltar la primera fila (encabezados)
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Cell tipoProductoCell = row.getCell(0); // Suponiendo que la columna 0 contiene el tipo de producto
+            Cell costoCell = row.getCell(1); // Suponiendo que la columna 1 contiene el costo por producto
+
+            String tipoProducto = tipoProductoCell.getStringCellValue();
+            int costo = (int) costoCell.getNumericCellValue();
+
+            // Verificar si ya existe la entrada en el Map
+            if (resultMap.containsKey(tipoProducto)) {
+                // Si existe, agregar el costo al valor existente
+                int sumaCosto = resultMap.get(tipoProducto) + costo;
+                resultMap.put(tipoProducto, sumaCosto);
+            } else {
+                // Si no existe, agregar una nueva entrada en el Map
+                resultMap.put(tipoProducto, costo);
+            }
+        }
+
+        fis.close();
+        return resultMap;
     }
 
     //Metodo para obtener los nombres de las hojas existentes en el excel
