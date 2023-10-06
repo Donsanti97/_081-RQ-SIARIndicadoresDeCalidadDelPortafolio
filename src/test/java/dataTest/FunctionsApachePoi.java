@@ -1143,15 +1143,13 @@ public class FunctionsApachePoi {
                 //System.out.println("Analizando: " + sheets2);
                 encabezados2 = getHeadersMasterfile(sheet1, sheet2);
                 for (String headers : encabezados2) {
-                    for (int i = 0; i < nameSheets2.size(); i++) {
-                        if (nameSheets2.get(i).contains("Comercial_Pzo_Perc_0.8")){
-                            sheets2 = nameSheets1.get(i);
+                        if (headers.contains("Comercial_Pzo_Perc_0.8")){
                             datosFiltrados = obtenerValoresDeEncabezados(masterFile, sheets2, camposDeseados, headers);
                             for (Map<String, String> datos : datosFiltrados){
                                 resultados.add(datos);
                             }
                         }
-                    }
+
 
                     //System.out.println("Headers2: " + headers);
                 }

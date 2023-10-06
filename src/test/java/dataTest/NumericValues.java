@@ -155,6 +155,17 @@ public class NumericValues {
                 for (Map<String, String> datos : resultados) {
                     for (Map.Entry<String, String> entryMasterFile : datos.entrySet()) {
                         System.out.println("KEY: " + entryMasterFile.getKey() + ", VALUE: " + entryMasterFile.getValue());
+
+                        if (entryOkCartera.getKey().equals(entryMasterFile.getKey())){
+                            //entryOkCartera.getValue().compareTo(entryMasterFile.getValue());
+                            String okCartera = entryOkCartera.getValue();
+                            String master = entryMasterFile.getValue();
+                            if (okCartera.equals(master)){
+                                System.out.println("los valores: " + entryOkCartera.getValue() + ", " + entryMasterFile.getValue() + "\n NO son iguales");
+                            }else {
+                                System.out.println("\"los valores: \" + entryOkCartera.getValue() + \", \" + entryMasterFile.getValue() + \"\\n SON iguales\"");
+                            }
+                        }
                     }
                 }
 
