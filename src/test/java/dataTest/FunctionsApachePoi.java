@@ -1,6 +1,5 @@
 package dataTest;
 
-import org.apache.poi.ss.format.CellFormatType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
@@ -14,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class FunctionsApachePoi {
@@ -131,7 +132,7 @@ public class FunctionsApachePoi {
             }
 
 
-            //Generar el area de los datos
+            //Generar el área de los datos
             CellReference topLeft = new CellReference(sheet.getFirstRowNum(), sheet.getRow(sheet.getFirstRowNum()).getFirstCellNum());
             CellReference bottomRight = new CellReference(sheet.getLastRowNum(), sheet.getRow(sheet.getLastRowNum()).getLastCellNum() - 1);
             AreaReference source = new AreaReference(topLeft, bottomRight, sheet.getWorkbook().getSpreadsheetVersion());
@@ -143,8 +144,6 @@ public class FunctionsApachePoi {
             //Crea la tabla dinamica en la hoja de trabajo
             XSSFPivotTable pivotTable = ((XSSFSheet) sheet).createPivotTable(source, pivotCellReference);//DW12
             pivotTable.addRowLabel(index);//Agregar etiqueta de fila para el campo Modalidad (12)
-            //pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
-
 
 
             switch (funcion.toLowerCase()){
@@ -153,6 +152,9 @@ public class FunctionsApachePoi {
                     break;
                 case "recuento":
                     pivotTable.addColumnLabel(DataConsolidateFunction.COUNT, index2, "Recuento de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
+                    break;
+                case "promedio":
+                    pivotTable.addColumnLabel(DataConsolidateFunction.AVERAGE, index2, "Promedio de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
 
             }
 
@@ -334,6 +336,49 @@ public class FunctionsApachePoi {
         return data;
     }
 
+    /*---------------------------------------------------------------------------------------------------*/
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, List<String> camposDeseados, int percent) {
+        List<Map<String, String>> data = new ArrayList<>();
+        List<String> headers = obtenerEncabezados(excelFilePath, sheetName);
+        try {
+            convertirExcel(excelFilePath);
+
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            for (int rowIndex = 1; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Map<String, String> rowData = new HashMap<>();
+                for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                    Cell cell = row.getCell(cellIndex);
+                    String header = headers.get(cellIndex);
+                    String value = "";
+                    double porcentaje = (double) percent / 100 ;
+                    if (cell != null) {
+                        if (cell.getCellType() == CellType.STRING) {
+                            value = cell.getStringCellValue();
+                        } else if (cell.getCellType() == CellType.NUMERIC) {
+                            value = String.valueOf(cell.getNumericCellValue() * porcentaje);
+                        }
+                    }
+                    if (camposDeseados.contains(header)) {
+                        rowData.put(header, value);
+                    }
+                }
+                data.add(rowData);
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            logger.error("Error al procesar el archivo Excel", e);
+        }
+        return data;
+    }
+
+
+    /*---------------------------------------------------------------------------------------------------*/
+
     //Metodo para obtener valores de los encabezados en un rago especifico de valores
     public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar, String valorInicio, String valorFin) {
         List<Map<String, String>> datosFiltrados = new ArrayList<>();
@@ -413,8 +458,10 @@ public class FunctionsApachePoi {
                                 value = dataCell.getStringCellValue();
                             } else if (dataCell.getCellType() == CellType.NUMERIC) {
                                 value = String.valueOf(dataCell.getNumericCellValue());
-                            } else if (dataCell.getCellType() == CellFormatType.DATE.) {
-                                
+
+                            } else if (dataCell.getCellType() == CellType.STRING && DateUtil.isCellDateFormatted(dataCell)) {
+                                DataFormatter dataFormatter = new DataFormatter();
+                                value = dataFormatter.formatCellValue(dataCell);
                             }
                         }
                         rowData.put(header, value);
@@ -519,6 +566,69 @@ public class FunctionsApachePoi {
                             }
                         }
 
+                        rowData.put(header, value);
+                    }
+                    datosFiltrados.add(rowData);
+                }
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            logger.error("Error al procesar el archivo Excel", e);
+        }
+        return datosFiltrados;
+    }
+
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName, String campoFiltrar1, String valorInicio1, String valorFin1, String campoFiltrar2, Date valorInicio2, Date valorFin2) {
+        List<Map<String, String>> datosFiltrados = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            List<String> headers = obtenerEncabezados(excelFilePath, sheetName);
+            int campoFiltrarIndex1 = headers.indexOf(campoFiltrar1);
+            int campoFiltrarIndex2 = headers.indexOf(campoFiltrar2);
+            if (campoFiltrarIndex1 == -1 || campoFiltrarIndex2 == -1) {
+                System.err.println("Alguno de los campos especificados para el filtro no existe.");
+                return datosFiltrados;
+            }
+
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            for (int rowIndex = 1; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Cell cell1 = row.getCell(campoFiltrarIndex1);
+                Cell cell2 = row.getCell(campoFiltrarIndex2);
+
+                // Convertir celda 2 a fecha si es de tipo fecha
+                Date fechaCelda2 = null;
+                if (cell2 != null && cell2.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell2)) {
+                    fechaCelda2 = cell2.getDateCellValue();
+                }
+
+                // Obtener el valor de celda 1 como cadena de texto
+                String valorCelda1 = (cell1 != null && cell1.getCellType() == CellType.STRING) ? cell1.getStringCellValue() : "";
+
+                if (fechaCelda2 != null &&
+                        valorCelda1.compareTo(valorInicio1) >= 0 && valorCelda1.compareTo(valorFin1) <= 0 &&
+                        fechaCelda2.compareTo(valorInicio2) >= 0 && fechaCelda2.compareTo(valorFin2) <= 0) {
+                    Map<String, String> rowData = new HashMap<>();
+                    for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                        Cell dataCell = row.getCell(cellIndex);
+                        String header = headers.get(cellIndex);
+                        String value = "";
+                        if (dataCell != null) {
+                            if (dataCell.getCellType() == CellType.STRING) {
+                                value = dataCell.getStringCellValue();
+                            } else if (dataCell.getCellType() == CellType.NUMERIC) {
+                                if (DateUtil.isCellDateFormatted(dataCell)) {
+                                    Date fecha = dataCell.getDateCellValue();
+                                    value = dateFormat.format(fecha);
+                                } else {
+                                    value = String.valueOf(dataCell.getNumericCellValue());
+                                }
+                            }
+                        }
                         rowData.put(header, value);
                     }
                     datosFiltrados.add(rowData);
@@ -779,5 +889,84 @@ public class FunctionsApachePoi {
         }
         return valor;
     }
+
+    /*--------------------OTROS METODOS PARA LEER Y HACER LA SUMATORIA POR VALOR---------------------------------------------------------------*/
+    public static List<Map<String, String>> leerExcel(String filePath) throws IOException {
+        List<Map<String, String>> data = new ArrayList<>();
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Supongamos que es la primera hoja
+
+            Row headerRow = sheet.getRow(0);
+
+            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row currentRow = sheet.getRow(rowIndex);
+                Map<String, String> rowMap = new HashMap<>();
+
+                for (int columnIndex = 0; columnIndex < headerRow.getLastCellNum(); columnIndex++) {
+                    Cell headerCell = headerRow.getCell(columnIndex);
+                    Cell currentCell = currentRow.getCell(columnIndex);
+
+                    String headerValue = headerCell.getStringCellValue();
+                    String cellValue = ""/*String.valueOf(currentCell.getNumericCellValue())*/; // Puedes adaptar esto para otros tipos de celdas
+                    if (currentCell.getCellType() == CellType.STRING){
+                        cellValue = currentCell.getStringCellValue();
+                    } else if (currentCell.getCellType() == CellType.NUMERIC) {
+                        cellValue = String.valueOf(currentCell.getNumericCellValue());
+
+                    }
+                    rowMap.put(headerValue, cellValue);
+                }
+
+                data.add(rowMap);
+            }
+        }
+
+        return data;
+    }
+
+    public static Map<String, String> calcularSumaPorValoresUnicos(String filePath, String firstHeader, String secondHeader, int percent) throws IOException {
+        List<Map<String, String>> data = leerExcel(filePath);
+        Map<String, Double> sumaPorValorUnico = new HashMap<>();
+
+        for (Map<String, String> row : data) {
+            String firstHeaderValue = row.get(firstHeader);
+            String secondHeaderValue = row.get(secondHeader);
+
+            if (firstHeaderValue != null && secondHeaderValue != null) {
+                try {
+                    double secondValue = Double.parseDouble(secondHeaderValue);
+                    double porcentaje = (double) percent / 100;
+                    double secondValueP = secondValue * porcentaje;
+
+                    if (sumaPorValorUnico.containsKey(firstHeaderValue)) {
+                        sumaPorValorUnico.put(firstHeaderValue, sumaPorValorUnico.get(firstHeaderValue) + (secondValueP));
+                    } else {
+                        sumaPorValorUnico.put(firstHeaderValue, secondValueP);
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignora las filas que no tienen valores numéricos en el segundo encabezado
+                }
+            }
+        }
+
+        // Redondea los valores a dos decimales
+        Map<String, String> resultadoFormateado = new HashMap<>();
+        DecimalFormat df = new DecimalFormat("0.00");
+        for (Map.Entry<String, Double> entry : sumaPorValorUnico.entrySet()) {
+            double valor = entry.getValue();
+            String valorFormateado = df.format(valor);
+            resultadoFormateado.put(entry.getKey(), valorFormateado);
+        }
+
+        return resultadoFormateado;
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
 }
 
