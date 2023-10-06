@@ -215,18 +215,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "suma");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -321,18 +309,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "suma");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
         }
     }
@@ -424,18 +400,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "suma");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -529,18 +493,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "suma");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -636,18 +588,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "suma");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -739,18 +679,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "suma");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -842,18 +770,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "RECUENTO");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -945,18 +861,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -1053,18 +957,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -1161,18 +1053,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "RECUENTO");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
@@ -1270,24 +1150,11 @@ public class HistoricoCarteraComercialPorOF {
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "PROMEDIO");
 
 
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
     }
 
-
-    //Mertodos a los que hay que hacerle un método aparte en la tabla dinámica para hallar el porcentaje 50%
     public static void comercialPercentil05(/*String filePath*/) throws IOException, ParseException {
 
         //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
@@ -1374,29 +1241,27 @@ public class HistoricoCarteraComercialPorOF {
                 System.out.println();
             }
 
+            System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
+            System.out.println(camposDeseados.get(0) + ": " +camposDeseados.get(1));
+            Map<String, String> resultado = calcularSumaPorValoresUnicos(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), 50);
+
+            for (Map.Entry<String, String> entry : resultado.entrySet()){
+                System.out.println("Valor único del primer encabezado: " + entry.getKey());
+                System.out.println("Suma correspondiente: " + entry.getValue());
+                System.out.println();
+            }
+
             System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
 
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
 
 
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
     }
 
-    //Mertodos a los que hay que hacerle un método aparte en la tabla dinámica para hallar el porcentaje 80%
 
     public static void comercialPercentil08(/*String filePath*/) throws IOException, ParseException {
 
@@ -1484,6 +1349,16 @@ public class HistoricoCarteraComercialPorOF {
                 System.out.println();
             }
 
+            System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
+            System.out.println(camposDeseados.get(0) + ": " +camposDeseados.get(1));
+            Map<String, String> resultado = calcularSumaPorValoresUnicos(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), 80);
+
+            for (Map.Entry<String, String> entry : resultado.entrySet()){
+                System.out.println("Valor único del primer encabezado: " + entry.getKey());
+                System.out.println("Suma correspondiente: " + entry.getValue());
+                System.out.println();
+            }
+
             System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
 
 
@@ -1505,214 +1380,6 @@ public class HistoricoCarteraComercialPorOF {
 
         }
     }
-
-    //Pendiente campo no existe en OKCartera
-    /*public static void bdCastigos(String filePath) throws IOException {
-
-        //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
-        //String filePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleTestData.xlsx";
-
-        IOUtils.setByteArrayMaxOverride(300000000);
-
-        List<String> sheetNames = obtenerNombresDeHojas(filePath);
-
-        List<String> headers = null;
-        List<Map<String, String>> datosFiltrados = null;
-        List<String> camposDeseados = Arrays.asList("centro_de_costo", "monto");
-        for (String sheetName : sheetNames) {
-            System.out.println("Contenido de la hoja: " + sheetName);
-            headers = obtenerEncabezados(filePath, sheetName);
-
-            // Listar campos disponibles
-            System.out.println("Campos disponibles:");
-            for (String header : headers) {
-                System.out.println(header);
-            }
-
-            // Especifica el campo en el que deseas aplicar el filtro
-            String campoFiltrar = "modalidad";
-            String valorInicio = "COMERCIAL"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "COMERCIAL"; // Reemplaza con el valor de fin del rango
-
-            // Filtrar los datos por el campo y el rango especificados
-            datosFiltrados = obtenerValoresDeEncabezados(filePath, sheetName, campoFiltrar, valorInicio, valorFin);
-
-            // Especifica los campos que deseas obtener
-            //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "re_est");
-
-            // Imprimir datos filtrados
-            System.out.println("Datos filtrados por " + campoFiltrar + " en el rango [" + valorInicio + ", " + valorFin + "]");
-            for (Map<String, String> rowData : datosFiltrados) {
-                for (String campoDeseado : camposDeseados) {
-                    String valorCampo = rowData.get(campoDeseado);
-
-                    System.out.println(campoDeseado + ": " + valorCampo);
-                }
-                System.out.println();
-            }
-            runtime();
-
-            System.out.println("----------------------");
-        }
-        //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "re_est");
-
-        // Crear una nueva hoja Excel con los datos filtrados
-        String nuevaHojaFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx"; // Reemplaza con la ruta y nombre de tu nuevo archivo Excel
-        crearNuevaHojaExcel(nuevaHojaFilePath, camposDeseados, datosFiltrados);
-
-        System.out.println("Analisis archivo temporal----------------------");
-
-        sheetNames = obtenerNombresDeHojas(nuevaHojaFilePath);
-
-        for (String sheetName : sheetNames) {
-            System.out.println("Contenido de la hoja: " + sheetName);
-
-            headers = obtenerEncabezados(nuevaHojaFilePath, sheetName);
-
-            System.out.println("Campos disponibles " + headers);
-
-            for (String header : headers) {
-                System.out.println(header);
-            }
-
-
-            //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "capital");
-            datosFiltrados = obtenerValoresDeEncabezados(nuevaHojaFilePath, sheetName, camposDeseados);
-
-
-            for (Map<String, String> rowData : datosFiltrados) {
-                for (String campoDeseado : camposDeseados) {
-                    String valorCampo = rowData.get(campoDeseado);
-                    System.out.println(campoDeseado + ": " + valorCampo);
-                }
-                System.out.println();
-            }
-
-            System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
-
-
-            tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
-
-
-            //Arreglar error al finalizar todos
-
-            System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }
-            runtime();
-
-        }
-    }*/
-
-    //Pendiente campo no existe en OKCartera
-    /*public static void clientesCastigados(String filePath) throws IOException {
-
-        //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
-        //String filePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleTestData.xlsx";
-
-        IOUtils.setByteArrayMaxOverride(300000000);
-
-        List<String> sheetNames = obtenerNombresDeHojas(filePath);
-
-        List<String> headers = null;
-        List<Map<String, String>> datosFiltrados = null;
-        List<String> camposDeseados = Arrays.asList("centro_de_costo", "Cliente");
-        for (String sheetName : sheetNames) {
-            System.out.println("Contenido de la hoja: " + sheetName);
-            headers = obtenerEncabezados(filePath, sheetName);
-
-            // Listar campos disponibles
-            System.out.println("Campos disponibles:");
-            for (String header : headers) {
-                System.out.println(header);
-            }
-
-            // Especifica el campo en el que deseas aplicar el filtro
-            String campoFiltrar = "modalidad";
-            String valorInicio = "COMERCIAL"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "COMERCIAL"; // Reemplaza con el valor de fin del rango
-
-            // Filtrar los datos por el campo y el rango especificados
-            datosFiltrados = obtenerValoresDeEncabezados(filePath, sheetName, campoFiltrar, valorInicio, valorFin);
-
-            // Especifica los campos que deseas obtener
-            //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "re_est");
-
-            // Imprimir datos filtrados
-            System.out.println("Datos filtrados por " + campoFiltrar + " en el rango [" + valorInicio + ", " + valorFin + "]");
-            for (Map<String, String> rowData : datosFiltrados) {
-                for (String campoDeseado : camposDeseados) {
-                    String valorCampo = rowData.get(campoDeseado);
-
-                    System.out.println(campoDeseado + ": " + valorCampo);
-                }
-                System.out.println();
-            }
-            runtime();
-
-            System.out.println("----------------------");
-        }
-        //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "re_est");
-
-        // Crear una nueva hoja Excel con los datos filtrados
-        String nuevaHojaFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx"; // Reemplaza con la ruta y nombre de tu nuevo archivo Excel
-        crearNuevaHojaExcel(nuevaHojaFilePath, camposDeseados, datosFiltrados);
-
-        System.out.println("Analisis archivo temporal----------------------");
-
-        sheetNames = obtenerNombresDeHojas(nuevaHojaFilePath);
-
-        for (String sheetName : sheetNames) {
-            System.out.println("Contenido de la hoja: " + sheetName);
-
-            headers = obtenerEncabezados(nuevaHojaFilePath, sheetName);
-
-            System.out.println("Campos disponibles " + headers);
-
-            for (String header : headers) {
-                System.out.println(header);
-            }
-
-
-            //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "capital");
-            datosFiltrados = obtenerValoresDeEncabezados(nuevaHojaFilePath, sheetName, camposDeseados);
-
-
-            for (Map<String, String> rowData : datosFiltrados) {
-                for (String campoDeseado : camposDeseados) {
-                    String valorCampo = rowData.get(campoDeseado);
-                    System.out.println(campoDeseado + ": " + valorCampo);
-                }
-                System.out.println();
-            }
-
-            System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
-
-
-            tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
-
-
-            //Arreglar error al finalizar todos
-
-            System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }
-            runtime();
-
-        }
-    }*/
 
     public static void comercialPzoProm(String filePath) throws IOException, ParseException {
 
@@ -1925,21 +1592,6 @@ public class HistoricoCarteraComercialPorOF {
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
-
-
-
             runtime();
 
 
@@ -2045,23 +1697,11 @@ public class HistoricoCarteraComercialPorOF {
                 System.out.println();
             }
 
-            System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
+            System.out.println("---------------------- CREACION TABLA DINAMICA comercialPzoPerc08");
 
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
 
-
-            //Arreglar error al finalizar todos
-
-            /*System.out.println("Analizando tablas dinamicas-----------");
-
-
-            Map<String, Integer> dataTable = extractPivotTableData(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1));
-            System.out.println("Se supone que son los datos de la dinámica---------------------------------------");
-
-            for (Map.Entry<String, Integer> entry : dataTable.entrySet()){
-                System.out.println("Claves:" + entry.getKey() + ", Value: " + entry.getValue());
-            }*/
             runtime();
 
         }
