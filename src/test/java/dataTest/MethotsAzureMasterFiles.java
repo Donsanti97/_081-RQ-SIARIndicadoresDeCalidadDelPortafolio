@@ -2,19 +2,24 @@ package dataTest;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.testng.annotations.Test;
 
+import javax.swing.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MethotsAzureMasterFiles {
 
-    public static String file1 = System.getProperty("user.dir") + "\\documents\\initialDocument\\Historico Cartera Comercial.xlsx";
-    public static String file2 = System.getProperty("user.dir") + "\\documents\\finalDocument\\Historico Cartera COMERCIAL por OF.xlsx";
-
+    public static String file1 = /*System.getProperty("user.dir") + */"Documentos\\documents\\initialDocument\\Historico Cartera Comercial.xlsx";
+    public static String file2 = /*System.getProperty("user.dir") + */"Documentos\\documents\\finalDocument\\Historico Cartera COMERCIAL por OF.xlsx";
 
     public static void buscarYListarArchivos(String ubicacion) throws IOException {
         Path ruta = Paths.get(ubicacion);
@@ -36,6 +41,72 @@ public class MethotsAzureMasterFiles {
                     System.out.println("Archivo: " + archivo.getFileName());
                 }
             }
+        }
+    }
+
+
+    public static String getDocument() {
+        // Crea un objeto JFileChooser
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Configura el directorio inicial en la carpeta de documentos del usuario
+        String rutaDocumentos = System.getProperty("user.home") + File.separator + "Documentos";
+        fileChooser.setCurrentDirectory(new File(rutaDocumentos));
+
+        // Filtra para mostrar solo archivos de Excel
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos Excel", "xlsx", "xls"));
+
+        // Muestra el diálogo de selección de archivo
+        int resultado = fileChooser.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+            String rutaCompleta = archivoSeleccionado.getAbsolutePath();
+            return rutaCompleta;
+        } else {
+            return null; // Si no se seleccionó ningún archivo, retorna null
+        }
+    }
+
+    /*-------------------------------------------------------------------------------------------------------------------------------*/
+    public static int findSheetIndexInExcelB(String excelAFilePath, String excelBFilePath, String targetSheetName) throws IOException {
+        FileInputStream excelAFile = new FileInputStream(excelAFilePath);
+        FileInputStream excelBFile = new FileInputStream(excelBFilePath);
+
+        Workbook workbookA = new XSSFWorkbook(excelAFile);
+        Workbook workbookB = new XSSFWorkbook(excelBFile);
+
+        int sheetIndexInB = -1;
+
+        for (int i = 0; i < workbookB.getNumberOfSheets(); i++) {
+            if (workbookB.getSheetName(i).equals(targetSheetName)) {
+                sheetIndexInB = i;
+                break;
+            }
+        }
+
+        List<String> removedSheetNames = new ArrayList<>();
+
+        if (sheetIndexInB != -1) {
+            // Elimina las hojas anteriores a la hoja objetivo en Excel B
+            for (int i = 0; i < sheetIndexInB; i++) {
+                String sheetNameToRemove = workbookB.getSheetName(i);
+                removedSheetNames.add(sheetNameToRemove);
+            }
+        }
+
+        // Cerrar los archivos
+        excelAFile.close();
+        excelBFile.close();
+
+        return sheetIndexInB;
+    }
+
+    public static void runtime() {
+        Runtime runtime = Runtime.getRuntime();
+        long minRunningMemory = (1024 * 1024);
+        if (runtime.freeMemory() < minRunningMemory) {
+            System.gc();
         }
     }
     /*---------------------------------------------------------------------------------------------------------------*/
@@ -60,6 +131,36 @@ public class MethotsAzureMasterFiles {
             throw new RuntimeException(e);
         }
         return shetNames;
+    }
+
+    public static List<String> getHeadersMF(String excelFilePath, String sheetName) {
+        List<String> headers = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            Row headerRow = sheet.getRow(168 );
+            String value = "";
+            for (Cell cell : headerRow) {
+                //headers.add(cell.getStringCellValue());
+                if (cell.getCellType() == CellType.STRING){
+                    value = cell.getStringCellValue();
+                } else if (cell.getCellType() == CellType.NUMERIC) {
+                    if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+                        value = String.valueOf(cell.getDateCellValue());
+                    }else {
+                        value = String.valueOf(cell.getNumericCellValue());
+                    }
+
+                }
+                headers.add(value);
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return headers;
     }
 
     public static List<Map<String, String>> getValuebyHeader(String excelFilePath, String sheetName) {
@@ -275,85 +376,6 @@ public class MethotsAzureMasterFiles {
         }
 
         return valoresPorCodCiudad;
-    }
-
-
-    @Test
-    public static void test() {
-        try {
-            FileInputStream fis = new FileInputStream(file1);
-            Workbook workbook = new XSSFWorkbook(fis);
-            FileInputStream fis2 = new FileInputStream(file2);
-            Workbook workbook2 = new XSSFWorkbook(fis2);
-            Sheet sheet1 = workbook.getSheetAt(0);
-            Sheet sheet2 = workbook2.getSheetAt(3);
-
-            List<String> nameSheets1 = getWorkSheet(file1, 0);
-            List<String> nameSheets2 = getWorkSheet(file2, 3);
-
-            List<String> encabezados1 = null;
-            List<String> encabezados2 = null;
-
-            List<Map<String, String>> valoresEncabezados1 = null;
-            List<Map<String, String>> valoresEncabezados2 = null;
-
-
-            for (String sheets : nameSheets1) {
-                System.out.print("SheetName: ");
-                System.out.println(sheets);
-                encabezados1 = getHeaders(file1, "CER150");
-                //System.out.println("Headers: ");
-                for (String headers : encabezados1) {
-                    //System.out.print(headers + "||");
-                    valoresEncabezados1 = getValuebyHeader(file1, sheets);
-                }
-            }
-            System.out.println("------------------------------------------------------------------------------------------");
-
-            valoresEncabezados1 = obtenerValoresPorFilas(sheet1, encabezados1);
-            for (Map<String, String> map : valoresEncabezados1) {
-                System.out.println("Fila: ");
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    System.out.println("Headers1: " + entry.getKey() + ", value: " + entry.getValue());
-                }
-            }
-
-            System.out.println("------------------------------------------------------");
-            for (String sheets2 : nameSheets2) {
-                System.out.println("SheetName2: " + sheets2);
-                encabezados2 = getHeadersMasterfile(sheet1, sheet2);
-                for (String headers : encabezados2) {
-                    System.out.print("Headers2: " + headers);
-                }
-            }
-
-            System.out.println("-------------------------------------------------------------------------------------");
-            valoresEncabezados2 = obtenerValoresPorFilas(sheet2, encabezados2);
-            for (Map<String, String> map : valoresEncabezados2) {
-                System.out.println("Fila2: ");
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    System.out.println("Headers2: " + entry.getKey() + ", Value: " + entry.getValue());
-                }
-            }
-
-            System.out.println("---------------------------------------------------------------------------------------");
-            for (String e1 : encabezados1) {
-                for (String e2 : encabezados2) {
-                    if (e1.equals(e2)) {
-                        System.out.println("equals");
-                    } else {
-                        System.out.println("No equals");
-                    }
-                }
-            }
-
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
 

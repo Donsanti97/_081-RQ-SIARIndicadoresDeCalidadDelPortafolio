@@ -17,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static dataTest.FunctionsApachePoi.*;
-import static dataTest.FunctionsApachePoi.crearNuevaHojaExcel;
 import static org.utils.MethotsAzureMasterFiles.getDocument;
 
 
@@ -44,6 +43,11 @@ public class NumericValues {
         JOptionPane.showMessageDialog(null, "ingrese a continuación en la consola la fecha de corte del archivo OkCartera sin espacios (Ejemplo: 30/02/2023)");
         String fechaCorte = mostrarCuadroDeTexto();
 
+        JOptionPane.showMessageDialog(null, "Espere un momento la última hoja está siendo analizada...");
+        waitMinutes(5);
+
+        JOptionPane.showMessageDialog(null, "Archivos analizados correctamente...");
+
 
 
         try {
@@ -51,6 +55,24 @@ public class NumericValues {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+    }
+
+    @Test
+    public static void testm(){
+        JOptionPane.showMessageDialog(null, "Seleccione el archivo Azure");
+        String azureFile = getDocument();
+        JOptionPane.showMessageDialog(null, "Seleccione el archivo Maestro");
+        String masterFile = getDocument();
+        JOptionPane.showMessageDialog(null, "ingrese a continuación en la consola la fecha de corte del archivo OkCartera sin espacios (Ejemplo: 30/02/2023)");
+        String fechaCorte = mostrarCuadroDeTexto();
+
+        List<Map<String, String>> getdata = getHeadersMFile(azureFile, masterFile, fechaCorte);
+        for (Map<String, String> data : getdata){
+            for (Map.Entry<String, String> entry : data.entrySet()){
+                System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
+            }
         }
 
     }
@@ -146,25 +168,19 @@ public class NumericValues {
             System.out.println(camposDeseados.get(0) + ": " +camposDeseados.get(1));
             Map<String, String> resultado = calcularSumaPorValoresUnicos(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), 80);
 
+            List<Map<String, String>> datosMasterFile = getHeadersMFile(azureFile, masterFile, fechaCorte);
+
             for (Map.Entry<String, String> entryOkCartera : resultado.entrySet()){
                 System.out.println("Valor único del primer encabezado: " + entryOkCartera.getKey());
                 System.out.println("Suma correspondiente: " + entryOkCartera.getValue());
                 System.out.println();
+                waitMinutes(5);
+                System.out.println("VALORES MASTER FILE");
+                for (Map<String, String> datoMF : datosMasterFile){
+                    for (Map.Entry<String, String> entry : datoMF.entrySet()){
+                        System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
+                        if (entryOkCartera.getKey().equals(entry.getKey())){
 
-                List<Map<String, String>> resultados = analisisMasterFile(azureFile, masterFile, fechaCorte);
-                for (Map<String, String> datos : resultados) {
-                    for (Map.Entry<String, String> entryMasterFile : datos.entrySet()) {
-                        System.out.println("KEY: " + entryMasterFile.getKey() + ", VALUE: " + entryMasterFile.getValue());
-
-                        if (entryOkCartera.getKey().equals(entryMasterFile.getKey())){
-                            //entryOkCartera.getValue().compareTo(entryMasterFile.getValue());
-                            String okCartera = entryOkCartera.getValue();
-                            String master = entryMasterFile.getValue();
-                            if (okCartera.equals(master)){
-                                System.out.println("los valores: " + entryOkCartera.getValue() + ", " + entryMasterFile.getValue() + "\n NO son iguales");
-                            }else {
-                                System.out.println("\"los valores: \" + entryOkCartera.getValue() + \", \" + entryMasterFile.getValue() + \"\\n SON iguales\"");
-                            }
                         }
                     }
                 }

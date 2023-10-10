@@ -11,6 +11,7 @@ import org.apache.poi.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testng.annotations.Test;
 
 import javax.swing.*;
 import java.io.*;
@@ -20,7 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.utils.MethotsAzureMasterFiles.*;
+import static dataTest.MethotsAzureMasterFiles.*;
+//import static org.utils.MethotsAzureMasterFiles.*;
 
 public class FunctionsApachePoi {
 
@@ -231,6 +233,13 @@ public class FunctionsApachePoi {
             throw new RuntimeException(e);
         }
     }
+    public static void waitMinutes(int minutes){
+        try {
+            Thread.sleep((minutes * 10000L));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static Map<String, Integer> extractPivotTableData(String filePath, String filterColumnName, String valueColumnName) throws IOException {
         FileInputStream fis = new FileInputStream(filePath);
@@ -328,8 +337,14 @@ public class FunctionsApachePoi {
             Workbook workbook = new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheet(sheetName);
             Row headerRow = sheet.getRow(0);
+            String value = "";
             for (Cell cell : headerRow) {
-                headers.add(cell.getStringCellValue());
+                if (cell.getCellType() == CellType.STRING) {
+                    value = cell.getStringCellValue();
+                } else if (cell.getCellType() == CellType.NUMERIC) {
+                    value = String.valueOf(cell.getNumericCellValue());
+                }
+                headers.add(value);
             }
             workbook.close();
             fis.close();
@@ -360,6 +375,48 @@ public class FunctionsApachePoi {
                             value = cell.getStringCellValue();
                         } else if (cell.getCellType() == CellType.NUMERIC) {
                             value = String.valueOf(cell.getNumericCellValue());
+                        }
+                    }
+                    if (camposDeseados.contains(header)) {
+                        rowData.put(header, value);
+                    }
+                }
+                data.add(rowData);
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            logger.error("Error al procesar el archivo Excel", e);
+        }
+        return data;
+    }
+    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, List<String> camposDeseados, String sheetName) {
+        List<Map<String, String>> data = new ArrayList<>();
+        List<String> headers = getHeadersMF(excelFilePath, sheetName);
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            int numberOfRows = sheet.getPhysicalNumberOfRows();
+            for (int rowIndex = 169; rowIndex < numberOfRows; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Map<String, String> rowData = new HashMap<>();
+                for (int cellIndex = 0; cellIndex < headers.size(); cellIndex++) {
+                    Cell cell = row.getCell(cellIndex);
+                    String header = headers.get(cellIndex);
+                    String value = "";
+                    if (cell != null) {
+                        if (cell.getCellType() == CellType.STRING) {
+                            value = cell.getStringCellValue();
+                        } else if (cell.getCellType() == CellType.NUMERIC) {
+
+                            if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)){
+                                Date date = cell.getDateCellValue();
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                value = sdf.format(date);
+                            }else {
+                                value = String.valueOf(cell.getNumericCellValue());
+                            }
                         }
                     }
                     if (camposDeseados.contains(header)) {
@@ -1065,9 +1122,10 @@ public class FunctionsApachePoi {
         }
     }
 
-    public static List<Map<String, String>> analisisMasterFile(String azureFile, String masterFile, String fechaCorte){
-        try {
-
+    public static  List<Map<String, String>> getHeadersMFile(String azureFile, String masterFile, String fechaCorte){
+        List<Map<String, String>> valoresEncabezados2 = new ArrayList<>();
+        List<Map<String, String>> datosFiltrados = new ArrayList<>();
+        try{
             if (azureFile != null && masterFile != null) {
                 System.out.println("Ruta del archivo Excel seleccionado: " + azureFile);
                 System.out.println("Ruta del archivo Excel seleccionado: " + masterFile);
@@ -1075,19 +1133,94 @@ public class FunctionsApachePoi {
                 System.out.println("No se seleccionó ningún archivo.");
             }
 
-
             FileInputStream fis = new FileInputStream(azureFile);
             Workbook workbook = new XSSFWorkbook(fis);
             FileInputStream fis2 = new FileInputStream(masterFile);
             Workbook workbook2 = new XSSFWorkbook(fis2);
             Sheet sheet1 = workbook.getSheetAt(0);
 
-            List<Map<String, String>> datosFiltrados = null;
-
             int indexF2 = 0;
             List<String> nameSheets1 = getWorkSheet(azureFile, 0);
             Sheet sheet2 = workbook2.getSheetAt(0);
             List<String> nameSheets2 = getWorkSheet(masterFile, 0);
+
+            for (int i = 0; i < nameSheets2.size(); i++) {
+                String s2 = nameSheets2.get(i);
+                String sheetName = s2.replaceAll("\\s", "");
+                String s1 = nameSheets2.get(0);
+                if (nameSheets1.get(0).equals(sheetName)){
+                    indexF2 = i;
+                    break;
+                }
+            }
+            System.out.println("INDEX: " + indexF2);
+            List<String> encabezados2 = null;
+
+
+            sheet2 = workbook2.getSheetAt(indexF2);
+            nameSheets2 = getWorkSheet(masterFile, indexF2);
+            List<String> camposDeseados = Arrays.asList("Cod_sucursal", fechaCorte);//Arrays.asList("Cod_sucursal", fechaCorte)
+            String value1 = "Cod_sucursal";
+
+            System.out.println("FIRST POSITION: " + nameSheets2.get(0));
+
+            for (String sheets : nameSheets2){
+                //encabezados2 = getHeadersMF(masterFile, sheets);
+                /*for (String header :  encabezados2){
+                    System.out.println("HEADERSMF: " + header);
+                    valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
+
+                }*/
+
+                //}
+                datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, sheets);
+                System.out.println("CAMPOS FILTRADOS: " + sheets);
+                /*for (Map<String, String> rowData : datosFiltrados) {
+                    for (String campoDeseado : camposDeseados) {
+                        String valorCampo = rowData.get(campoDeseado);
+                        if (valorCampo != null) {
+                            System.out.println(campoDeseado + ": " + valorCampo);
+                            break;
+                        }
+                    }
+                    System.out.println();
+                }*/
+
+                for (Map<String, String> rowData : datosFiltrados){
+                    for (Map.Entry<String, String> entry : rowData.entrySet()){
+                        System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return datosFiltrados;
+    }
+
+    /*public static List<Map<String, String>> obtenerValoresEncabezados2(String file1, String file2) {
+        List<Map<String, String>> valoresEncabezados2 = new ArrayList<>();
+
+        try {
+
+            if (file1 != null && file2 != null) {
+                System.out.println("Ruta del archivo Excel seleccionado: " + file1);
+                System.out.println("Ruta del archivo Excel seleccionado: " + file2);
+            } else {
+                System.out.println("No se seleccionó ningún archivo.");
+            }
+
+            FileInputStream fis = new FileInputStream(file1);
+            Workbook workbook = new XSSFWorkbook(fis);
+            FileInputStream fis2 = new FileInputStream(file2);
+            Workbook workbook2 = new XSSFWorkbook(fis2);
+            Sheet sheet1 = workbook.getSheetAt(0);
+
+            int indexF2 = 0;
+            List<String> nameSheets1 = getWorkSheet(file1, 0);
+            Sheet sheet2 = workbook2.getSheetAt(0);
+            List<String> nameSheets2 = getWorkSheet(file2, 0);
 
             for (String s2 : nameSheets2) {
                 String sheetname = s2.replaceAll("\\s", "");
@@ -1097,87 +1230,88 @@ public class FunctionsApachePoi {
                         System.out.println("La hoja de trabajo se encontró en Excel B en el índice: " + indexF2);
                         break;
                     } else {
-                        //System.out.println("Analizando datos...");
+                        System.out.println("Analizando datos...");
                         break;
                     }
                 }
             }
 
             sheet2 = workbook2.getSheetAt(indexF2);
-            nameSheets2 = getWorkSheet(masterFile, indexF2);
+            nameSheets2 = getWorkSheet(file2, indexF2);
 
             List<String> encabezados1 = null;
             List<String> encabezados2 = null;
 
             List<Map<String, String>> valoresEncabezados1 = null;
-            List<Map<String, String>> valoresEncabezados2 = null;
 
             //System.out.println("Analizando archivo Azure");
             for (String sheets : nameSheets1) {
-                //System.out.print("Analizando: ");
+                System.out.print("Analizando... ");
                 //System.out.println(sheets);
-                encabezados1 = getHeaders(azureFile, sheets);
-                //System.out.println("Headers: ");
+                encabezados1 = getHeaders(file1, sheets);
                 for (String headers : encabezados1) {
-                    //System.out.print(headers + "||");
-                    valoresEncabezados1 = getValuebyHeader(azureFile, sheets);
+                    valoresEncabezados1 = getValuebyHeader(file1, sheets);
                 }
             }
             System.out.println("------------------------------------------------------------------------------------------");
 
-            valoresEncabezados1 = obtenerValoresPorFilas(sheet1, encabezados1);
+            *//*valoresEncabezados1 = obtenerValoresPorFilas(sheet1, encabezados1);
             for (Map<String, String> map : valoresEncabezados1) {
                 //System.out.println("Analizando valores... ");
                 for (Map.Entry<String, String> entry : map.entrySet()) {
                     //System.out.println("Headers1: " + entry.getKey() + ", value: " + entry.getValue());
                 }
-            }
-            Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaCorte);
-            List<String> camposDeseados = Arrays.asList("codigo_sucursal", fechaCorte);
-            List<Map<String, String>> resultados = new ArrayList<>();
-
+            }*//*
 
             System.out.println("------------------------------------------------------");
             System.out.println("Analizando archivo Maestro");
             for (String sheets2 : nameSheets2) {
-                //System.out.println("Analizando: " + sheets2);
+                System.out.println("Analizando: " + sheets2);
                 encabezados2 = getHeadersMasterfile(sheet1, sheet2);
                 for (String headers : encabezados2) {
-                        if (headers.contains("Comercial_Pzo_Perc_0.8")){
-                            datosFiltrados = obtenerValoresDeEncabezados(masterFile, sheets2, camposDeseados, headers);
-                            for (Map<String, String> datos : datosFiltrados){
-                                resultados.add(datos);
-                            }
-                        }
-
-
-                    //System.out.println("Headers2: " + headers);
+                    System.out.println("Headers2: " + headers);
                 }
             }
 
+            System.out.println("-------------------------------------------------------------------------------------");
+            valoresEncabezados2 = obtenerValoresPorFilas(sheet2, encabezados2);
+            for (Map<String, String> map : valoresEncabezados2) {
+                System.out.println("Analizando valores... ");
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    System.out.println("Headers2: " + entry.getKey() + ", Value: " + entry.getValue());
+                }
+            }
 
             System.out.println("---------------------------------------------------------------------------------------");
-            System.out.println("Analisis completado...");
+        *//*for (String e1 : encabezados1) {
+            for (String e2 : encabezados2) {
+                if (e1.equals(e2)) {
+                    System.out.println("equals" + e1 + ", " + e2);
+                } else {
+                    System.out.println("No equals");
+                }
+            }
+        }*//*
+            System.out.println("Análisis completado...");
             workbook.close();
             workbook2.close();
             fis.close();
             fis2.close();
 
-            return resultados;
-
             //moveDocument(file2, destino);
 
-            //JOptionPane.showMessageDialog(null, "Archivos analizados correctamente sin errores");
-
+            JOptionPane.showMessageDialog(null, "Espere un momento la siguiente hoja está siendo analizada...");
+            waitMinutes(2);
 
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
-    }
+
+        return valoresEncabezados2;
+    }*/
+
 
     public static String mostrarCuadroDeTexto() {
         // Crea una ventana Swing

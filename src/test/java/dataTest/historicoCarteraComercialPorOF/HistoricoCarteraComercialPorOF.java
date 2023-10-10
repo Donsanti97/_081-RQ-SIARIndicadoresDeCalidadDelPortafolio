@@ -109,14 +109,6 @@ public class HistoricoCarteraComercialPorOF {
             /*comercialPercentil08(excelFilePath);
             waitSeconds(5);*/
 
-            comercialPzoProm(excelFilePath);
-            waitSeconds(5);
-
-            /*comercialPzoPerc05(excelFilePath);
-            waitSeconds(5);*/
-
-            /*comercialPzoPerc08(excelFilePath);
-            waitSeconds();*/
 
 
 
@@ -1251,7 +1243,7 @@ public class HistoricoCarteraComercialPorOF {
                 System.out.println();
             }
 
-            System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
+            //System.out.println("---------------------- CREACION TABLA DINAMICA CARTERA BRUTA");
 
 
             tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
@@ -1381,6 +1373,7 @@ public class HistoricoCarteraComercialPorOF {
         }
     }
 
+    /*---------------------------------------------------------------------------------------------------------------------*/
     public static void comercialPzoProm(String filePath) throws IOException, ParseException {
 
         //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
@@ -1490,7 +1483,6 @@ public class HistoricoCarteraComercialPorOF {
     }
 
     //Mertodos a los que hay que hacerle un método aparte en la tabla dinámica para hallar el porcentaje 50%
-    @Test
     public static void comercialPzoPerc05(/*String filePath*/) throws IOException, ParseException {
 
         //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
@@ -1599,7 +1591,6 @@ public class HistoricoCarteraComercialPorOF {
         }
     }
 
-    @Test
     //Mertodos a los que hay que hacerle un método aparte en la tabla dinámica para hallar el porcentaje 80%
     public static void comercialPzoPerc08(/*String filePath*/) throws IOException, ParseException {
 
