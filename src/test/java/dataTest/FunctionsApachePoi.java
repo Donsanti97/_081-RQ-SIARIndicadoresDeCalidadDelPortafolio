@@ -412,12 +412,15 @@ public class FunctionsApachePoi {
 
                             if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)){
                                 Date date = cell.getDateCellValue();
+                                System.out.println("DATE: " + date);
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                                 value = sdf.format(date);
                             }else {
                                 value = String.valueOf(cell.getNumericCellValue());
                             }
                         }
+                    }else {
+                        System.out.println("LA FILA " + cell + " ES NULL");
                     }
                     if (camposDeseados.contains(header)) {
                         rowData.put(header, value);
@@ -1165,7 +1168,7 @@ public class FunctionsApachePoi {
             System.out.println("FIRST POSITION: " + nameSheets2.get(0));
 
             for (String sheets : nameSheets2){
-                //encabezados2 = getHeadersMF(masterFile, sheets);
+                encabezados2 = getHeadersMF(masterFile, sheets);
                 /*for (String header :  encabezados2){
                     System.out.println("HEADERSMF: " + header);
                     valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
@@ -1173,24 +1176,33 @@ public class FunctionsApachePoi {
                 }*/
 
                 //}
+                datosFiltrados = obtenerValoresPorFilas(sheet2, encabezados2);
+                for (Map<String, String> datos : datosFiltrados){
+                    for (Map.Entry<String, String> dates : datos.entrySet()){
+                        System.out.println("KEY: " + dates.getKey() + ", VALUE: " + dates.getValue());
+                    }
+                }
+
                 datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, sheets);
                 System.out.println("CAMPOS FILTRADOS: " + sheets);
-                /*for (Map<String, String> rowData : datosFiltrados) {
+                for (Map<String, String> rowData : datosFiltrados) {
                     for (String campoDeseado : camposDeseados) {
                         String valorCampo = rowData.get(campoDeseado);
-                        if (valorCampo != null) {
+                        System.out.println(campoDeseado + ": " + valorCampo);
+                        //break;
+                        /*if (valorCampo != null) {
                             System.out.println(campoDeseado + ": " + valorCampo);
                             break;
-                        }
+                        }*/
                     }
                     System.out.println();
-                }*/
+                }
 
-                for (Map<String, String> rowData : datosFiltrados){
+                /*for (Map<String, String> rowData : datosFiltrados){
                     for (Map.Entry<String, String> entry : rowData.entrySet()){
                         System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
                     }
-                }
+                }*/
             }
 
         } catch (Exception e) {

@@ -179,8 +179,11 @@ public class NumericValues {
                 for (Map<String, String> datoMF : datosMasterFile){
                     for (Map.Entry<String, String> entry : datoMF.entrySet()){
                         System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
-                        if (entryOkCartera.getKey().equals(entry.getKey())){
+                        if (entryOkCartera.getKey().equals(entry.getValue())){
+                            System.out.println("IGUALES");
 
+                        }else {
+                            System.out.println("NO IGUALES");
                         }
                     }
                 }
