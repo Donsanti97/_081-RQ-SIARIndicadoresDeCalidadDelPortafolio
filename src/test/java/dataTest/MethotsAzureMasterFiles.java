@@ -142,18 +142,8 @@ public class MethotsAzureMasterFiles {
             Row headerRow = sheet.getRow(168 );
             String value = "";
             for (Cell cell : headerRow) {
-                //headers.add(cell.getStringCellValue());
-                if (cell.getCellType() == CellType.STRING){
-                    value = cell.getStringCellValue();
-                } else if (cell.getCellType() == CellType.NUMERIC) {
-                    if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-                        value = String.valueOf(cell.getDateCellValue());
-                    }else {
-                        value = String.valueOf(cell.getNumericCellValue());
-                    }
+                headers.add(obtenerValorCelda(cell));
 
-                }
-                headers.add(value);
             }
             workbook.close();
             fis.close();

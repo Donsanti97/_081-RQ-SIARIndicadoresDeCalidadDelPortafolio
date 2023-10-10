@@ -1125,6 +1125,24 @@ public class FunctionsApachePoi {
         }
     }
 
+    public static List<String> getHeaders(String excelFilePath, String sheetName) {
+        List<String> headers = new ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName);
+            Row headerRow = sheet.getRow(168);
+            for (Cell cell : headerRow) {
+                headers.add(obtenerValorCelda(cell));
+            }
+            workbook.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return headers;
+    }
+
     public static  List<Map<String, String>> getHeadersMFile(String azureFile, String masterFile, String fechaCorte){
         List<Map<String, String>> valoresEncabezados2 = new ArrayList<>();
         List<Map<String, String>> datosFiltrados = new ArrayList<>();
@@ -1168,12 +1186,13 @@ public class FunctionsApachePoi {
             System.out.println("FIRST POSITION: " + nameSheets2.get(0));
 
             for (String sheets : nameSheets2){
-                encabezados2 = getHeadersMF(masterFile, sheets);
-                /*for (String header :  encabezados2){
+                //encabezados2 = getHeadersMF(masterFile, sheets);
+                encabezados2 = getHeaders(masterFile, sheets);
+                for (String header :  encabezados2){
                     System.out.println("HEADERSMF: " + header);
                     valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
 
-                }*/
+                }
 
                 //}
                 datosFiltrados = obtenerValoresPorFilas(sheet2, encabezados2);
@@ -1183,20 +1202,18 @@ public class FunctionsApachePoi {
                     }
                 }
 
-                datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, sheets);
+                /*datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, sheets);
                 System.out.println("CAMPOS FILTRADOS: " + sheets);
                 for (Map<String, String> rowData : datosFiltrados) {
                     for (String campoDeseado : camposDeseados) {
                         String valorCampo = rowData.get(campoDeseado);
-                        System.out.println(campoDeseado + ": " + valorCampo);
-                        //break;
-                        /*if (valorCampo != null) {
+                        if (valorCampo != null) {
                             System.out.println(campoDeseado + ": " + valorCampo);
                             break;
-                        }*/
+                        }
                     }
                     System.out.println();
-                }
+                }*/
 
                 /*for (Map<String, String> rowData : datosFiltrados){
                     for (Map.Entry<String, String> entry : rowData.entrySet()){
