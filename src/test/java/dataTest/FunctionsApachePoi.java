@@ -30,8 +30,6 @@ public class FunctionsApachePoi {
     private static final Logger logger = LogManager.getLogger(FunctionsApachePoi.class);
 
 
-
-
     //Metodo para obtener los valores de encabezados generales
     public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, String sheetName) {
         List<Map<String, String>> data = new ArrayList<>();
@@ -63,14 +61,16 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            logger.error("Error al procesar el archivo Excel", e);;
+            logger.error("Error al procesar el archivo Excel", e);
+            ;
         }
         return data;
     }
 
     public static List<Map<String, String>> obtenerValoresDeEncabezados(List<String> headers, String excelFilePath, String sheetName) {
         List<Map<String, String>> data = new ArrayList<>();
-        /*List<String>*/ headers = obtenerEncabezados(excelFilePath, sheetName);
+        /*List<String>*/
+        headers = obtenerEncabezados(excelFilePath, sheetName);
         try {
             FileInputStream fis = new FileInputStream(excelFilePath);
             Workbook workbook = new XSSFWorkbook(fis);
@@ -98,7 +98,8 @@ public class FunctionsApachePoi {
             workbook.close();
             fis.close();
         } catch (IOException e) {
-            logger.error("Error al procesar el archivo Excel", e);;
+            logger.error("Error al procesar el archivo Excel", e);
+            ;
         }
         return data;
     }
@@ -159,14 +160,14 @@ public class FunctionsApachePoi {
             int index2 = 0;
             for (int i = 0; i < headers.size(); i++) {
                 String header = headers.get(i);
-                if(header.contains(codSucursal)){
+                if (header.contains(codSucursal)) {
                     index = i;
                     System.out.println("Index1: " + index);
                 }
             }
             for (int i = 0; i < headers.size(); i++) {
                 String header = headers.get(i);
-                if(header.contains(colValores)){
+                if (header.contains(colValores)) {
                     index2 = i;
                     System.out.println("Index2: " + index2);
 
@@ -188,7 +189,7 @@ public class FunctionsApachePoi {
             pivotTable.addRowLabel(index);//Agregar etiqueta de fila para el campo Modalidad (12)
 
 
-            switch (funcion.toLowerCase()){
+            switch (funcion.toLowerCase()) {
                 case "suma":
                     pivotTable.addColumnLabel(DataConsolidateFunction.SUM, index2, "Suma de " + colValores);//Agrega la columna de la que se va a hacer la suma y la etiqueta de la funcion suma(15)
                     break;
@@ -226,14 +227,16 @@ public class FunctionsApachePoi {
             System.gc();
         }
     }
-    public static void waitSeconds(int seconds){
+
+    public static void waitSeconds(int seconds) {
         try {
             Thread.sleep((seconds * 1000L));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public static void waitMinutes(int minutes){
+
+    public static void waitMinutes(int minutes) {
         try {
             Thread.sleep((minutes * 10000L));
         } catch (Exception e) {
@@ -390,6 +393,7 @@ public class FunctionsApachePoi {
         }
         return data;
     }
+
     public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, List<String> camposDeseados, String sheetName) {
         List<Map<String, String>> data = new ArrayList<>();
         List<String> headers = getHeadersMF(excelFilePath, sheetName);
@@ -410,16 +414,16 @@ public class FunctionsApachePoi {
                             value = cell.getStringCellValue();
                         } else if (cell.getCellType() == CellType.NUMERIC) {
 
-                            if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)){
+                            if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
                                 Date date = cell.getDateCellValue();
                                 System.out.println("DATE: " + date);
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                                 value = sdf.format(date);
-                            }else {
+                            } else {
                                 value = String.valueOf(cell.getNumericCellValue());
                             }
                         }
-                    }else {
+                    } else {
                         System.out.println("LA FILA " + cell + " ES NULL");
                     }
                     if (camposDeseados.contains(header)) {
@@ -490,7 +494,7 @@ public class FunctionsApachePoi {
                     Cell cell = row.getCell(cellIndex);
                     String header = headers.get(cellIndex);
                     String value = "";
-                    double porcentaje = (double) percent / 100 ;
+                    double porcentaje = (double) percent / 100;
                     if (cell != null) {
                         if (cell.getCellType() == CellType.STRING) {
                             value = cell.getStringCellValue();
@@ -1008,7 +1012,16 @@ public class FunctionsApachePoi {
                     break;
                 case NUMERIC:
                     if (DateUtil.isCellDateFormatted(cell)) {
-                        valor = cell.getDateCellValue().toString();
+                        //valor = cell.getDateCellValue().toString();
+                        String formatDate = cell.getDateCellValue().toString();
+                        SimpleDateFormat formatoEntrada = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+                        try {
+                            Date date = formatoEntrada.parse(formatDate);
+                            SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
+                            valor = formatoSalida.format(date);
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
                     } else {
                         valor = Double.toString(cell.getNumericCellValue());
                     }
@@ -1047,7 +1060,7 @@ public class FunctionsApachePoi {
 
                     String headerValue = headerCell.getStringCellValue();
                     String cellValue = ""/*String.valueOf(currentCell.getNumericCellValue())*/; // Puedes adaptar esto para otros tipos de celdas
-                    if (currentCell.getCellType() == CellType.STRING){
+                    if (currentCell.getCellType() == CellType.STRING) {
                         cellValue = currentCell.getStringCellValue();
                     } else if (currentCell.getCellType() == CellType.NUMERIC) {
                         cellValue = String.valueOf(currentCell.getNumericCellValue());
@@ -1143,10 +1156,10 @@ public class FunctionsApachePoi {
         return headers;
     }
 
-    public static  List<Map<String, String>> getHeadersMFile(String azureFile, String masterFile, String fechaCorte){
+    public static List<Map<String, String>> getHeadersMFile(String azureFile, String masterFile, String fechaCorte) {
         List<Map<String, String>> valoresEncabezados2 = new ArrayList<>();
         List<Map<String, String>> datosFiltrados = new ArrayList<>();
-        try{
+        try {
             if (azureFile != null && masterFile != null) {
                 System.out.println("Ruta del archivo Excel seleccionado: " + azureFile);
                 System.out.println("Ruta del archivo Excel seleccionado: " + masterFile);
@@ -1169,7 +1182,7 @@ public class FunctionsApachePoi {
                 String s2 = nameSheets2.get(i);
                 String sheetName = s2.replaceAll("\\s", "");
                 String s1 = nameSheets2.get(0);
-                if (nameSheets1.get(0).equals(sheetName)){
+                if (nameSheets1.get(0).equals(sheetName)) {
                     indexF2 = i;
                     break;
                 }
@@ -1185,35 +1198,39 @@ public class FunctionsApachePoi {
 
             System.out.println("FIRST POSITION: " + nameSheets2.get(0));
 
-            for (String sheets : nameSheets2){
-                //encabezados2 = getHeadersMF(masterFile, sheets);
-                encabezados2 = getHeaders(masterFile, sheets);
-                for (String header :  encabezados2){
+            for (String sheets : nameSheets2) {
+                encabezados2 = getHeadersMF(masterFile, sheets);
+                //encabezados2 = getHeaders(masterFile, sheets);
+                for (String header : encabezados2) {
                     System.out.println("HEADERSMF: " + header);
-                    valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
+                    /*if (header.contains("31")) {
+
+                    }*/
+                    //valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
 
                 }
 
                 //}
-                datosFiltrados = obtenerValoresPorFilas(sheet2, encabezados2);
-                for (Map<String, String> datos : datosFiltrados){
-                    for (Map.Entry<String, String> dates : datos.entrySet()){
+                /*datosFiltrados = obtenerValoresPorFilas(sheet2, encabezados2);
+                for (Map<String, String> datos : datosFiltrados) {
+                    for (Map.Entry<String, String> dates : datos.entrySet()) {
                         System.out.println("KEY: " + dates.getKey() + ", VALUE: " + dates.getValue());
                     }
-                }
+                }*/
 
-                /*datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, sheets);
+                datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, nameSheets2.get(0));//sheets
                 System.out.println("CAMPOS FILTRADOS: " + sheets);
                 for (Map<String, String> rowData : datosFiltrados) {
                     for (String campoDeseado : camposDeseados) {
                         String valorCampo = rowData.get(campoDeseado);
-                        if (valorCampo != null) {
+                        System.out.println(campoDeseado + ": " + valorCampo);
+                        /*if (valorCampo != null) {
                             System.out.println(campoDeseado + ": " + valorCampo);
                             break;
-                        }
+                        }*/
                     }
                     System.out.println();
-                }*/
+                }
 
                 /*for (Map<String, String> rowData : datosFiltrados){
                     for (Map.Entry<String, String> entry : rowData.entrySet()){

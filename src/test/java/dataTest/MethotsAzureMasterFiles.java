@@ -269,25 +269,35 @@ public class MethotsAzureMasterFiles {
     public static String obtenerValorCelda(Cell cell) {
         String valor = "";
         if (cell != null) {
-            switch (cell.getCellType()) {
-                case STRING:
-                    valor = cell.getStringCellValue();
-                    break;
-                case NUMERIC:
-                    if (DateUtil.isCellDateFormatted(cell)) {
-                        valor = cell.getDateCellValue().toString();
-                    } else {
-                        valor = Double.toString(cell.getNumericCellValue());
-                    }
-                    break;
-                case BOOLEAN:
-                    valor = Boolean.toString(cell.getBooleanCellValue());
-                    break;
-                case FORMULA:
-                    valor = evaluarFormula(cell);
-                    break;
-                default:
-                    break;
+            try {
+                switch (cell.getCellType()) {
+                    case STRING:
+                        valor = cell.getStringCellValue();
+                        break;
+                    case NUMERIC:
+                        if (DateUtil.isCellDateFormatted(cell)) {
+                            //valor = cell.getDateCellValue().toString();
+                            String formatDate = cell.getDateCellValue().toString();
+                            SimpleDateFormat formatoEntrada = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+                            Date date = formatoEntrada.parse(formatDate);
+                            SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
+                            valor = formatoSalida.format(date);
+                        } else {
+                            valor = Double.toString(cell.getNumericCellValue());
+                        }
+                        break;
+                    case BOOLEAN:
+                        valor = Boolean.toString(cell.getBooleanCellValue());
+                        break;
+                    case FORMULA:
+                        valor = evaluarFormula(cell);
+                        break;
+                    default:
+                        break;
+                }
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         return valor;

@@ -23,6 +23,21 @@ import static org.utils.MethotsAzureMasterFiles.getDocument;
 public class NumericValues {
 
 
+    @Test
+    public static void parsear(){
+        String fechaStr = "Thu Jan 31 00:00:00 COT 2013";
+        SimpleDateFormat formatoEntrada = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+
+        try {
+            Date fecha = formatoEntrada.parse(fechaStr);
+            System.out.println("FECHA: " + fecha);
+            SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
+            String formatedDate = formatoSalida.format(fecha);
+            System.out.println("FECHA FORMATEADA: " + formatedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public static void TEST() {
