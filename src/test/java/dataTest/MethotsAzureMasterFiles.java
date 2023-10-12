@@ -140,7 +140,10 @@ public class MethotsAzureMasterFiles {
             Workbook workbook = new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheet(sheetName);
             Row headerRow = sheet.getRow(168 );
-            String value = "";
+            for (int i = 0; i < headerRow.getRowNum(); i++) {
+                System.out.println("ROW: " + headerRow.getCell(i));
+            }
+
             for (Cell cell : headerRow) {
                 headers.add(obtenerValorCelda(cell));
 
@@ -272,25 +275,42 @@ public class MethotsAzureMasterFiles {
             try {
                 switch (cell.getCellType()) {
                     case STRING:
+                        System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getStringCellValue() + ", CELL: " + cell);
                         valor = cell.getStringCellValue();
                         break;
                     case NUMERIC:
                         if (DateUtil.isCellDateFormatted(cell)) {
                             //valor = cell.getDateCellValue().toString();
+                            System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getNumericCellValue() + ", CELL: " + cell);
                             String formatDate = cell.getDateCellValue().toString();
                             SimpleDateFormat formatoEntrada = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
                             Date date = formatoEntrada.parse(formatDate);
                             SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
-                            valor = formatoSalida.format(date);
-                        } else {
-                            valor = Double.toString(cell.getNumericCellValue());
+                            //valor = formatoSalida.format(date);
+                            valor = cell.toString();
+                            System.out.println("VALOR " + valor);
+                        }else if (cell.getCellType() == CellType.FORMULA){
+                            System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getNumericCellValue() + ", CELL: " + cell);
+                            System.out.println("ES FORMULA");
+                            valor = evaluarFormula(cell);
+                            System.out.println("VALOR " + valor);
+                        }else {
+                            //valor = Date.toString(cell.getDateCellValue()/*NumericCellValue()*/);
+                            System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getNumericCellValue() + ", CELL: " + cell);
+                            valor = cell.getStringCellValue();
+                            System.out.println("VALOR " + valor);
                         }
                         break;
                     case BOOLEAN:
+                        System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getBooleanCellValue() + ", CELL: " + cell);
                         valor = Boolean.toString(cell.getBooleanCellValue());
                         break;
                     case FORMULA:
+                        System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getCellFormula().toString() + ", CELL: " + cell);
+                        System.err.println("Formato fecha no valido."+ cell.getCellFormula() +" Encabezado "+ cell.getSheet().getSheetName() +"-"+ cell.getRow().getRowNum() +"-"+ cell.getColumnIndex() +" puede contener formula o valor cadena de caracteres");
                         valor = evaluarFormula(cell);
+                        System.out.println("VALORF: " + valor);
+                        System.exit(1);
                         break;
                     default:
                         break;
@@ -308,7 +328,17 @@ public class MethotsAzureMasterFiles {
             Workbook workbook = cell.getSheet().getWorkbook();
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             CellValue cellValue = evaluator.evaluate(cell);
-            return cellValue.formatAsString();
+            if (cellValue.getCellType() == CellType.NUMERIC) {
+                double valor = cellValue.getNumberValue();
+                //System.out.println("El valor de la fórmula en A5 es: " + valor);
+                return Double.toString(valor);
+            } else if (cellValue.getCellType() == CellType.STRING) {
+                String valor = cellValue.getStringValue();
+                //System.out.println("El valor de la fórmula en A5 es: " + valor);
+                return valor;
+            }else {
+                return cellValue.formatAsString();
+            }
         } catch (Exception e) {
             return "";
         }

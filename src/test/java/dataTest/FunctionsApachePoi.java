@@ -1193,22 +1193,50 @@ public class FunctionsApachePoi {
 
             sheet2 = workbook2.getSheetAt(indexF2);
             nameSheets2 = getWorkSheet(masterFile, indexF2);
-            List<String> camposDeseados = Arrays.asList("Cod_sucursal", fechaCorte);//Arrays.asList("Cod_sucursal", fechaCorte)
+
             String value1 = "Cod_sucursal";
 
             System.out.println("FIRST POSITION: " + nameSheets2.get(0));
+            Date date = null;
+
 
             for (String sheets : nameSheets2) {
                 encabezados2 = getHeadersMF(masterFile, sheets);
                 //encabezados2 = getHeaders(masterFile, sheets);
+                System.out.println("SHEET: " + sheets);
                 for (String header : encabezados2) {
                     System.out.println("HEADERSMF: " + header);
+                    /*date = new SimpleDateFormat("dd/MM/yyyy").parse(fechaCorte);
+                    System.out.println("DATE: " + date);*/
+                    System.out.println("FECHACORTE: " + fechaCorte);
+                    boolean error = false;
+                    if (header.matches(".*\\d.*")) {
+                        if (header.equals(fechaCorte)) {
+                            System.out.println("COINCIDENCIA: " + fechaCorte + ": " + header);
+                            error = true;
+                        } else {
+                            error = false;
+                        /*System.out.println("NO SE ENCONTRARON COINCIDENCIAS EN LAS FECHAS DE CORTE. POR FAVOR REVISE EL FORMATO CONTENIDO EN LAS MISMAS");
+                        System.out.println("PARA VALIDAR FECHAS DE CORTE LOS CAMPOS NO PUEDEN TRAER FORMULAS Y EL FORMATO DEBE SER TIPO FECHA EN LA HOJA: " + sheets);
+                        System.exit(1);*/
+                        }
+                    }
+                    if (!error){
+                        System.err.println("Error crítico: la aplicación no puede continuar. El formato de la celda no es tipo Fecha");
+                        System.err.println("Formato fecha no valido. Encabezado puede contener formula o valor cadena de caracteres");
+                        System.err.println("Revise fechas de corte en hoja: " + sheets + ", Encabezado: " + header);
+                        System.exit(1); // Salir con un código de error
+                    }
                     /*if (header.contains("31")) {
 
                     }*/
                     //valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
-
                 }
+                /*assert date != null;
+                SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
+                String fecha = formatoSalida.format(date);
+                System.out.println("FECHA: " + fecha);*/
+                List<String> camposDeseados = Arrays.asList("Cod_sucursal", fechaCorte);//Arrays.asList("Cod_sucursal", fechaCorte)
 
                 //}
                 /*datosFiltrados = obtenerValoresPorFilas(sheet2, encabezados2);
