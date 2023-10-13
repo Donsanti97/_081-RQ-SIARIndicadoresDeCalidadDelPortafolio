@@ -145,7 +145,7 @@ public class MethotsAzureMasterFiles {
             }
 
             for (Cell cell : headerRow) {
-                headers.add(obtenerValorCelda(cell));
+                headers.add(obtenerValorVisibleCelda(cell));//obtenerValorCelda(cell)
 
             }
             workbook.close();
@@ -288,31 +288,30 @@ public class MethotsAzureMasterFiles {
                             SimpleDateFormat formatoSalida = new SimpleDateFormat("dd/MM/yyyy");
                             //valor = formatoSalida.format(date);
                             valor = cell.toString();
-                            System.out.println("VALOR " + valor);
-                        }else if (cell.getCellType() == CellType.FORMULA){
-                            System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getNumericCellValue() + ", CELL: " + cell);
-                            System.out.println("ES FORMULA");
-                            valor = evaluarFormula(cell);
-                            System.out.println("VALOR " + valor);
+                            System.out.println("VALOR1 " + valor);
                         }else {
                             //valor = Date.toString(cell.getDateCellValue()/*NumericCellValue()*/);
                             System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getNumericCellValue() + ", CELL: " + cell);
                             valor = cell.getStringCellValue();
-                            System.out.println("VALOR " + valor);
+                            System.out.println("VALOR3 " + valor);
                         }
                         break;
                     case BOOLEAN:
                         System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getBooleanCellValue() + ", CELL: " + cell);
                         valor = Boolean.toString(cell.getBooleanCellValue());
                         break;
-                    case FORMULA:
-                        System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getCellFormula().toString() + ", CELL: " + cell);
-                        System.err.println("Formato fecha no valido."+ cell.getCellFormula() +" Encabezado "+ cell.getSheet().getSheetName() +"-"+ cell.getRow().getRowNum() +"-"+ cell.getColumnIndex() +" puede contener formula o valor cadena de caracteres");
+                    //case FORMULA:
+                        //System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getCellFormula().toString() + ", CELL: " + cell + " CELLADD: " + cell.getAddress());
+                        /*System.err.println("Formato fecha no valido."+ cell.getCellFormula() +" Encabezado "+ cell.getSheet().getSheetName() +" Posición: "+ cell.getAddress() +" puede contener formula o valor cadena de caracteres");
                         valor = evaluarFormula(cell);
                         System.out.println("VALORF: " + valor);
-                        System.exit(1);
-                        break;
+                        FunctionsApachePoi.waitSeconds(20);
+                        System.exit(1);*/
+                        //valor = obtenerValorCeldaString(cell);
+
+                        //break;
                     default:
+                        valor = obtenerValorCeldaString(cell);
                         break;
                 }
 
@@ -323,7 +322,40 @@ public class MethotsAzureMasterFiles {
         return valor;
     }
 
-    public static String evaluarFormula(Cell cell) {
+    public static String obtenerValorVisibleCelda(Cell cell) {
+        try {
+            DataFormatter dataFormatter = new DataFormatter();
+            String valor = "";
+
+            // Verificar el tipo de celda
+            switch (cell.getCellType()) {
+                case STRING:
+                    valor = cell.getStringCellValue();
+                    break;
+                case NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        valor = dataFormatter.formatCellValue(cell);
+                    } else {
+                        valor = dataFormatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString());
+                    }
+                    break;
+                case BOOLEAN:
+                    valor = Boolean.toString(cell.getBooleanCellValue());
+                    break;
+                case BLANK:
+                    valor = "";
+                    break;
+                default:
+                    valor = dataFormatter.formatCellValue(cell);
+            }
+
+            return valor;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public static String evaluarFormulas(Cell cell) {
         try {
             Workbook workbook = cell.getSheet().getWorkbook();
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
@@ -342,6 +374,44 @@ public class MethotsAzureMasterFiles {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public static String obtenerValorCeldaString(Cell cell) {
+        try {
+            DataFormatter dataFormatter = new DataFormatter();
+            String valor = dataFormatter.formatCellValue(cell);
+            return valor;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public static String evaluarFormula(Cell cell) {
+        try {
+            Workbook workbook = cell.getSheet().getWorkbook();
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            CellValue cellValue = evaluator.evaluate(cell);
+
+            if (cellValue.getCellType() == CellType.FORMULA) {
+                // Si la celda contiene una fórmula, obtén su valor calculado
+                if (cellValue.getCellType() == CellType.NUMERIC) {
+                    double valor = cellValue.getNumberValue();
+                    return Double.toString(valor);
+                } else if (cellValue.getCellType() == CellType.STRING) {
+                    return cellValue.getStringValue();
+                }
+            } else {
+                // Si no es una fórmula, obtén el valor directo de la celda
+                System.out.println("NO ES FORMULA");
+                DataFormatter dataFormatter = new DataFormatter();
+                String valor = dataFormatter.formatCellValue(cell);
+                return valor;
+            }
+        } catch (Exception e) {
+            return "";
+        }
+
+        return ""; // Valor por defecto si no se pudo obtener el valor de la fórmula
     }
 
     public static List<Map<String, String>> obtenerValoresPorFilas(Sheet sheet, List<String> encabezados) {

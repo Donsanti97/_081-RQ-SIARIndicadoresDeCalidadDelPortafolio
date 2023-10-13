@@ -394,7 +394,7 @@ public class FunctionsApachePoi {
         return data;
     }
 
-    public static List<Map<String, String>> obtenerValoresDeEncabezados(String excelFilePath, List<String> camposDeseados, String sheetName) {
+    public static List<Map<String, String>> obtenerValoresDeEncabezadosMF(String excelFilePath, /*List<String> camposDeseados,*/ String sheetName) {
         List<Map<String, String>> data = new ArrayList<>();
         List<String> headers = getHeadersMF(excelFilePath, sheetName);
         try {
@@ -426,9 +426,10 @@ public class FunctionsApachePoi {
                     } else {
                         System.out.println("LA FILA " + cell + " ES NULL");
                     }
-                    if (camposDeseados.contains(header)) {
+                    /*if (camposDeseados.contains(header)) {
                         rowData.put(header, value);
-                    }
+                    }*/
+                    rowData.put(header, value);
                 }
                 data.add(rowData);
             }
@@ -1210,15 +1211,15 @@ public class FunctionsApachePoi {
                     System.out.println("DATE: " + date);*/
                     System.out.println("FECHACORTE: " + fechaCorte);
                     boolean error = false;
-                    if (header.matches(".*\\d.*")) {
+                    /*if (header.matches(".*\\d.*")) {
                         if (header.equals(fechaCorte)) {
                             System.out.println("COINCIDENCIA: " + fechaCorte + ": " + header);
                             error = true;
                         } else {
                             error = false;
-                        /*System.out.println("NO SE ENCONTRARON COINCIDENCIAS EN LAS FECHAS DE CORTE. POR FAVOR REVISE EL FORMATO CONTENIDO EN LAS MISMAS");
+                        *//*System.out.println("NO SE ENCONTRARON COINCIDENCIAS EN LAS FECHAS DE CORTE. POR FAVOR REVISE EL FORMATO CONTENIDO EN LAS MISMAS");
                         System.out.println("PARA VALIDAR FECHAS DE CORTE LOS CAMPOS NO PUEDEN TRAER FORMULAS Y EL FORMATO DEBE SER TIPO FECHA EN LA HOJA: " + sheets);
-                        System.exit(1);*/
+                        System.exit(1);*//*
                         }
                     }
                     if (!error){
@@ -1226,9 +1227,6 @@ public class FunctionsApachePoi {
                         System.err.println("Formato fecha no valido. Encabezado puede contener formula o valor cadena de caracteres");
                         System.err.println("Revise fechas de corte en hoja: " + sheets + ", Encabezado: " + header);
                         System.exit(1); // Salir con un código de error
-                    }
-                    /*if (header.contains("31")) {
-
                     }*/
                     //valoresEncabezados2 = obtenerValoresDeEncabezados(masterFile, nameSheets2.get(0));//sheets
                 }
@@ -1245,11 +1243,10 @@ public class FunctionsApachePoi {
                         System.out.println("KEY: " + dates.getKey() + ", VALUE: " + dates.getValue());
                     }
                 }*/
-
-                datosFiltrados = obtenerValoresDeEncabezados(masterFile, camposDeseados, nameSheets2.get(0));//sheets
-                System.out.println("CAMPOS FILTRADOS: " + sheets);
+                datosFiltrados = obtenerValoresDeEncabezadosMF(masterFile, /*camposDeseados,*/ nameSheets2.get(1));//sheets
+                System.out.println("CAMPOS FILTRADOS: " + nameSheets2.get(0));
                 for (Map<String, String> rowData : datosFiltrados) {
-                    for (String campoDeseado : camposDeseados) {
+                    for (String campoDeseado : encabezados2) {//camposDeseados
                         String valorCampo = rowData.get(campoDeseado);
                         System.out.println(campoDeseado + ": " + valorCampo);
                         /*if (valorCampo != null) {

@@ -92,6 +92,11 @@ public class NumericValues {
 
     }
 
+    @Test
+    public static void evaluarFormula(){
+
+    }
+
 
     public static void findFields(String okCarteraFile, String masterFile, String azureFile, String mesAñoCorte, String fechaCorte) throws IOException, ParseException {
 
