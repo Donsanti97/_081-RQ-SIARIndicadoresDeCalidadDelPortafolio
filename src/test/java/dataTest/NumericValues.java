@@ -12,11 +12,13 @@ import org.testng.annotations.Test;
 
 import javax.swing.*;
 import java.io.*;
+import java.security.Key;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static dataTest.FunctionsApachePoi.*;
+import static org.utils.MethotsAzureMasterFiles.getDirecotry;
 import static org.utils.MethotsAzureMasterFiles.getDocument;
 
 
@@ -40,7 +42,12 @@ public class NumericValues {
     }
 
     @Test
-    public static void TEST() {
+    public static void main(){
+
+    }
+
+    @Test
+    public void TEST() {
         String excelFilePathTest = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleOfTheMiddleTestData.xlsx";
         String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
 
@@ -54,19 +61,26 @@ public class NumericValues {
         JOptionPane.showMessageDialog(null, "Seleccione el archivo OkCartera");
         String okCartera = getDocument();
         JOptionPane.showMessageDialog(null, "ingrese a continuación en la consola el número del mes y año de corte del archivo OkCartera sin espacios (Ejemplo: 02/2023 (febrero/2023))");
-        String mesAñoCorte = mostrarCuadroDeTexto();
+        String mesAnoCorte = mostrarCuadroDeTexto();
         JOptionPane.showMessageDialog(null, "ingrese a continuación en la consola la fecha de corte del archivo OkCartera sin espacios (Ejemplo: 30/02/2023)");
         String fechaCorte = mostrarCuadroDeTexto();
+        JOptionPane.showMessageDialog(null, "A continuación se creará un archivo temporal " +
+                "\n Se recomienda seleccionar la carpeta \"Documentos\" para esta función...");
+        String tempFile = getDirecotry() + "\\TemporalFile.xlsx";
 
         JOptionPane.showMessageDialog(null, "Espere un momento la última hoja está siendo analizada...");
         waitMinutes(5);
 
-        JOptionPane.showMessageDialog(null, "Archivos analizados correctamente...");
+
 
 
 
         try {
-            findFields(okCartera, masterFile, azureFile, mesAñoCorte, fechaCorte);
+            findFields(okCartera, masterFile, azureFile, mesAnoCorte, fechaCorte, "Comercial_Pzo_Perc_0.8", tempFile);
+            JOptionPane.showMessageDialog(null, "Archivos analizados correctamente...");
+            waitSeconds(10);
+            deleteTempFile();
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -83,7 +97,8 @@ public class NumericValues {
         JOptionPane.showMessageDialog(null, "ingrese a continuación en la consola la fecha de corte del archivo OkCartera sin espacios (Ejemplo: 30/02/2023)");
         String fechaCorte = mostrarCuadroDeTexto();
 
-        List<Map<String, String>> getdata = getHeadersMFile(azureFile, masterFile, fechaCorte);
+        List<Map<String, String>> getdata = null/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
+        getdata = obtenerValoresEncabezados2(azureFile, masterFile, "Comercial_Pzo_Perc_0.8", fechaCorte);
         for (Map<String, String> data : getdata){
             for (Map.Entry<String, String> entry : data.entrySet()){
                 System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
@@ -98,7 +113,7 @@ public class NumericValues {
     }
 
 
-    public static void findFields(String okCarteraFile, String masterFile, String azureFile, String mesAñoCorte, String fechaCorte) throws IOException, ParseException {
+    public void findFields(String okCarteraFile, String masterFile, String azureFile, String mesAnoCorte, String fechaCorte, String hoja, String tempFile) throws IOException, ParseException {
 
         //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
         //String okCarteraFile = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleTestData.xlsx";
@@ -124,8 +139,8 @@ public class NumericValues {
             String campoFiltrar = "modalidad";
             String valorInicio = "COMERCIAL"; // Reemplaza con el valor de inicio del rango
             String valorFin = "COMERCIAL"; // Reemplaza con el valor de fin del rango
-            String fechaInicio = "01/" + mesAñoCorte;
-            String fechaFin = "31/" + mesAñoCorte;
+            String fechaInicio = "01/" + mesAnoCorte;
+            String fechaFin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
             Date rangoFin = new SimpleDateFormat("dd/MM/yyyy").parse(fechaFin);
 
@@ -153,17 +168,18 @@ public class NumericValues {
         //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "re_est");
 
         // Crear una nueva hoja Excel con los datos filtrados
-        String nuevaHojaFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx"; // Reemplaza con la ruta y nombre de tu nuevo archivo Excel
-        crearNuevaHojaExcel(nuevaHojaFilePath, camposDeseados, datosFiltrados);
+        //
+        // Reemplaza con la ruta y nombre de tu nuevo archivo Excel
+        crearNuevaHojaExcel(tempFile, camposDeseados, datosFiltrados);
 
         System.out.println("Analisis archivo temporal----------------------");
 
-        sheetNames = obtenerNombresDeHojas(nuevaHojaFilePath);
+        sheetNames = obtenerNombresDeHojas(tempFile);
 
         for (String sheetName : sheetNames) {
             System.out.println("Contenido de la hoja: " + sheetName);
 
-            headers = obtenerEncabezados(nuevaHojaFilePath, sheetName);
+            headers = obtenerEncabezados(tempFile, sheetName);
 
             System.out.println("Campos disponibles " + headers);
 
@@ -173,7 +189,7 @@ public class NumericValues {
 
 
             //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "capital");
-            datosFiltrados = obtenerValoresDeEncabezados(nuevaHojaFilePath, sheetName, camposDeseados, 80);
+            datosFiltrados = obtenerValoresDeEncabezados(tempFile, sheetName, camposDeseados, 80);
 
 
             for (Map<String, String> rowData : datosFiltrados) {
@@ -186,35 +202,34 @@ public class NumericValues {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " +camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), 80);
+            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
 
-            List<Map<String, String>> datosMasterFile = getHeadersMFile(azureFile, masterFile, fechaCorte);
+            List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
+
 
             for (Map.Entry<String, String> entryOkCartera : resultado.entrySet()){
-                System.out.println("Valor único del primer encabezado: " + entryOkCartera.getKey());
-                System.out.println("Suma correspondiente: " + entryOkCartera.getValue());
-                System.out.println();
-                waitMinutes(5);
-                System.out.println("VALORES MASTER FILE");
                 for (Map<String, String> datoMF : datosMasterFile){
                     for (Map.Entry<String, String> entry : datoMF.entrySet()){
-                        System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
-                        if (entryOkCartera.getKey().equals(entry.getValue())){
-                            System.out.println("IGUALES");
+                        /*------------------------------------------------------------*/
+                        if (entryOkCartera.getKey().contains(entry.getKey())){
 
-                        }else {
-                            System.out.println("NO IGUALES");
+                            System.out.println("CODIGO ENCONTRADO");
+
+
+                            if (!entryOkCartera.getValue().equals(entry.getValue())){
+
+                                System.out.println("LOS VALORES ENCONTRADOS SON DISTINTOS-> " + entryOkCartera.getValue() + ": " + entry.getValue() + " CON RESPECTO AL CODIGO: " + entry.getKey());
+                            }else {
+
+                                System.out.println("LOS VALORES ENCONTRADOS SON IGUALES-> " +  entryOkCartera.getValue() + ": " + entry.getValue() + " CON RESPECTO AL CODIGO: " + entry.getKey());
+
+                            }
                         }
+                        /*-------------------------------------------------------------------*/
                     }
                 }
 
             }
-
-            System.out.println("---------------------- CREACION TABLA DINAMICA comercialPzoPerc08");
-
-
-            tablasDinamicasApachePoi(nuevaHojaFilePath, camposDeseados.get(0), camposDeseados.get(1), "SUMA");
-
             runtime();
 
         }
@@ -224,7 +239,7 @@ public class NumericValues {
 
     @Test
     public static void deleteTempFile() {
-        eliminarExcel(System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TemporalFile.xlsx", 5);
+        eliminarExcel(System.getProperty("user.home") + File.separator + "Documentos\\TemporalFile.xlsx", 5);
     }
 
     private static final Logger logger = LogManager.getLogger(FunctionsApachePoi.class);

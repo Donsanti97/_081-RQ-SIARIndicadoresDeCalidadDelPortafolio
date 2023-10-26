@@ -18,9 +18,6 @@ import java.util.*;
 
 public class MethotsAzureMasterFiles {
 
-    public static String file1 = /*System.getProperty("user.dir") + */"Documentos\\documents\\initialDocument\\Historico Cartera Comercial.xlsx";
-    public static String file2 = /*System.getProperty("user.dir") + */"Documentos\\documents\\finalDocument\\Historico Cartera COMERCIAL por OF.xlsx";
-
     public static void buscarYListarArchivos(String ubicacion) throws IOException {
         Path ruta = Paths.get(ubicacion);
 
@@ -222,7 +219,7 @@ public class MethotsAzureMasterFiles {
                 Iterator<Cell> cellIterator = row.cellIterator();
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
-                    encabezados.add(obtenerValorCelda(cell));
+                    encabezados.add(obtenerValorVisibleCelda(cell));
                 }
                 break; // Terminamos de buscar encabezados una vez que los encontramos
             }
@@ -264,7 +261,7 @@ public class MethotsAzureMasterFiles {
         Iterator<Cell> cellIterator = row.cellIterator();
         while (cellIterator.hasNext()) {
             Cell cell = cellIterator.next();
-            valoresFila.add(obtenerValorCelda(cell));
+            valoresFila.add(obtenerValorVisibleCelda(cell));//obtenerValorCelda()
         }
         return valoresFila;
     }
@@ -300,18 +297,18 @@ public class MethotsAzureMasterFiles {
                         System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getBooleanCellValue() + ", CELL: " + cell);
                         valor = Boolean.toString(cell.getBooleanCellValue());
                         break;
-                    //case FORMULA:
-                        //System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getCellFormula().toString() + ", CELL: " + cell + " CELLADD: " + cell.getAddress());
+                    case FORMULA:
+                            System.out.println("CELLTYPE " + cell.getCellType() + ": " + cell.getCellFormula().toString() + ", CELL: " + cell + " CELLADD: " + cell.getAddress());
                         /*System.err.println("Formato fecha no valido."+ cell.getCellFormula() +" Encabezado "+ cell.getSheet().getSheetName() +" Posición: "+ cell.getAddress() +" puede contener formula o valor cadena de caracteres");
                         valor = evaluarFormula(cell);
                         System.out.println("VALORF: " + valor);
                         FunctionsApachePoi.waitSeconds(20);
                         System.exit(1);*/
-                        //valor = obtenerValorCeldaString(cell);
+                        valor = obtenerValorCeldaString(cell);
 
                         //break;
                     default:
-                        valor = obtenerValorCeldaString(cell);
+                        /*valor = obtenerValorCeldaString(cell);*/
                         break;
                 }
 
@@ -412,6 +409,119 @@ public class MethotsAzureMasterFiles {
         }
 
         return ""; // Valor por defecto si no se pudo obtener el valor de la fórmula
+    }
+
+    public static List<Map<String, String>> createMapList(List<Map<String, String>> originalList, String keyHeader, String valueHeader) {
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        for (Map<String, String> originalMap : originalList) {
+            String key = originalMap.get(keyHeader);
+            String value = originalMap.get(valueHeader);
+
+            Map<String, String> newMap = new HashMap<>();
+            newMap.put(key, value);
+
+            mapList.add(newMap);
+        }
+
+        return mapList;
+    }
+
+    public static List<Map<String, String>> obtenerValoresPorFilas(Workbook workbook1, Workbook workbook2, String sheetName1, String sheetName2, String header1, String header2) throws IOException {
+        List<Map<String, String>> valoresPorFilas = new ArrayList<>();
+        Sheet sheet1 = workbook1.getSheet(sheetName1);
+        Sheet sheet2 = workbook2.getSheet(sheetName2);
+
+        List<String> encabezados = getHeadersMasterfile(sheet1, sheet2);
+
+        int indexHeader1 = encabezados.indexOf(header1);
+        int indexHeader2 = encabezados.indexOf(header2);
+
+        if (indexHeader1 == -1 || indexHeader2 == -1) {
+            // Los encabezados especificados no se encontraron en la lista de encabezados
+            // Puedes manejar esta situación como desees, por ejemplo, lanzando una excepción
+            throw new IllegalArgumentException("Los encabezados especificados no se encontraron en la hoja.");
+        }
+
+        Iterator<Row> rowIterator = sheet1.iterator();
+        // Omitir la primera fila ya que contiene los encabezados
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            List<String> valoresFila = obtenerValoresFila(row);
+
+            Map<String, String> fila = new HashMap<>();
+            try {
+                fila.put(header1, valoresFila.get(indexHeader1));
+                fila.put(header2, valoresFila.get(indexHeader2));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+
+            valoresPorFilas.add(fila);
+        }
+
+        return valoresPorFilas;
+    }
+
+    public static List<Map<String, String>> obtenerValoresPorFilas(Workbook workbook1, Workbook workbook2, String sheetName1, String sheetName2) throws IOException {
+        List<Map<String, String>> valoresPorFilas = new ArrayList<>();
+        Sheet sheet1 = workbook1.getSheet(sheetName1);
+        Sheet sheet2 = workbook2.getSheet(sheetName2);
+
+        List<String> encabezados = getHeadersMasterfile(sheet1, sheet2);
+
+        Iterator<Row> rowIterator = sheet1.iterator();
+        // Omitir la primera fila ya que contiene los encabezados
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            List<String> valoresFila = obtenerValoresFila(row);
+
+            Map<String, String> fila = new HashMap<>();
+            for (int i = 0; i < encabezados.size() && i < valoresFila.size(); i++) {
+                String encabezado = encabezados.get(i);
+                String valor = valoresFila.get(i);
+                fila.put(encabezado, valor);
+            }
+
+            valoresPorFilas.add(fila);
+        }
+
+        return valoresPorFilas;
+    }
+    public static List<Map<String, String>> obtenerValoresPorFilas(Sheet sheet, Sheet sheet2) throws IOException {
+        List<Map<String, String>> valoresPorFilas = new ArrayList<>();
+        List<String> encabezados = getHeadersMasterfile(sheet, sheet2);
+
+        Iterator<Row> rowIterator = sheet.iterator();
+        // Omitir la primera fila ya que contiene los encabezados
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            List<String> valoresFila = obtenerValoresFila(row);
+
+            Map<String, String> fila = new HashMap<>();
+            for (int i = 0; i < encabezados.size() && i < valoresFila.size(); i++) {
+                String encabezado = encabezados.get(i);
+                String valor = valoresFila.get(i);
+                fila.put(encabezado, valor);
+            }
+
+            valoresPorFilas.add(fila);
+        }
+
+        return valoresPorFilas;
     }
 
     public static List<Map<String, String>> obtenerValoresPorFilas(Sheet sheet, List<String> encabezados) {

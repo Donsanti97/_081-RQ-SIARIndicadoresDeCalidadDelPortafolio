@@ -17,9 +17,6 @@ import java.util.*;
 
 public class MethotsAzureMasterFiles {
 
-    public static String file1 = /*System.getProperty("user.dir") + */"Documentos\\documents\\initialDocument\\Historico Cartera Comercial.xlsx";
-    public static String file2 = /*System.getProperty("user.dir") + */"Documentos\\documents\\finalDocument\\Historico Cartera COMERCIAL por OF.xlsx";
-
     public static void buscarYListarArchivos(String ubicacion) throws IOException {
         Path ruta = Paths.get(ubicacion);
 
@@ -54,6 +51,29 @@ public class MethotsAzureMasterFiles {
 
         // Filtra para mostrar solo archivos de Excel
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos Excel", "xlsx", "xls"));
+
+        // Muestra el diálogo de selección de archivo
+        int resultado = fileChooser.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+            String rutaCompleta = archivoSeleccionado.getAbsolutePath();
+            return rutaCompleta;
+        } else {
+            return null; // Si no se seleccionó ningún archivo, retorna null
+        }
+    }
+
+    public static String getDirecotry() {
+        // Crea un objeto JFileChooser
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Configura el directorio inicial en la carpeta de documentos del usuario
+        String rutaDocumentos = System.getProperty("user.home")/* + File.separator + "Documentos"*/;
+        fileChooser.setCurrentDirectory(new File(rutaDocumentos));
+
+        // Filtra para mostrar solo archivos de Excel
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         // Muestra el diálogo de selección de archivo
         int resultado = fileChooser.showOpenDialog(null);
