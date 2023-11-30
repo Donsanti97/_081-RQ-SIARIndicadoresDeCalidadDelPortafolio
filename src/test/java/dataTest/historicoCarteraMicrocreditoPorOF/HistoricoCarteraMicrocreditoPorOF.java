@@ -1,10 +1,8 @@
 package dataTest.historicoCarteraMicrocreditoPorOF;
 
 import org.apache.poi.util.IOUtils;
-import org.testng.annotations.Test;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,24 +11,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static dataTest.MethotsAzureMasterFiles.*;
 import static dataTest.FunctionsApachePoi.*;
-import static org.utils.MethotsAzureMasterFiles.getDirecotry;
-import static org.utils.MethotsAzureMasterFiles.getDocument;
 
 public class HistoricoCarteraMicrocreditoPorOF {
     //34 Hojas
 
-    public static void deleteTempFile() {
-        eliminarExcel(System.getProperty("user.home") + File.separator + "Documentos\\TemporalFile.xlsx", 5);
-    }
 
-    @Test
     public static void configuracion(String masterFile) {
 
         JOptionPane.showMessageDialog(null, "Seleccione el archivo Azure");
         String azureFile = getDocument();
-        /*JOptionPane.showMessageDialog(null, "Seleccione el archivo Maestro");
-        String masterFile = getDocument();*/
         JOptionPane.showMessageDialog(null, "Seleccione el archivo OkCartera");
         String okCartera = getDocument();
         JOptionPane.showMessageDialog(null, "ingrese a continuación en la consola el número del mes y año de corte del archivo OkCartera sin espacios (Ejemplo: 02/2023 (febrero/2023))");
@@ -39,7 +30,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
         String fechaCorte = mostrarCuadroDeTexto();
         JOptionPane.showMessageDialog(null, "A continuación se creará un archivo temporal " +
                 "\n Se recomienda seleccionar la carpeta \"Documentos\" para esta función...");
-        String tempFile = getDirecotry() + "\\TemporalFile.xlsx";
+        String tempFile = getDirectory() + "\\TemporalFile.xlsx";
 
 
 
@@ -49,7 +40,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
             System.out.println("Espere el proceso de análisis va a comenzar...");
             waitSeconds(5);
 
-            JOptionPane.showMessageDialog(null, "Espere un momento el análisis puede ser demorado...");
+            System.out.println("Espere un momento el análisis puede ser demorado...");
             waitMinutes(5);
 
             carteraBruta(okCartera, masterFile, azureFile, fechaCorte, "Cartera Bruta", tempFile);
@@ -172,23 +163,24 @@ public class HistoricoCarteraMicrocreditoPorOF {
             JOptionPane.showMessageDialog(null, "Archivos analizados correctamente...");
             waitSeconds(10);
 
-
+            deleteTempFile(tempFile);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        deleteTempFile();
+
 
     }
 
     public static void carteraBruta(String okCarteraFile, String masterFile, String azureFile, String fechaCorte, String hoja , String tempFile) throws IOException {
 
-        //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\TablaDinamica.xlsx"; // Reemplaza con la ruta de tu archivo Excel
-        //String excelFilePath = System.getProperty("user.dir") + "\\documents\\procesedDocuments\\MiddleTestData.xlsx";
-
         IOUtils.setByteArrayMaxOverride(300000000);
 
+        System.setProperty("org.apache.poi.ooxml.strict", "false");
+
         List<String> sheetNames = obtenerNombresDeHojas(okCarteraFile);
+
+        System.setProperty("org.apache.poi.ooxml.strict", "true");
 
         List<String> headers = null;
         List<Map<String, String>> datosFiltrados = null;
@@ -260,7 +252,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -376,7 +368,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -489,7 +481,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -532,7 +524,6 @@ public class HistoricoCarteraMicrocreditoPorOF {
         List<String> sheetNames = obtenerNombresDeHojas(okCarteraFile);
 
         String reEstCapital = "re_est";
-        String diasDeMora = "dias_de_mora";
 
         List<String> headers = null;
         List<Map<String, String>> datosFiltrados = null;
@@ -604,7 +595,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -721,7 +712,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -834,7 +825,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -878,7 +869,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
 
         List<String> headers = null;
         List<Map<String, String>> datosFiltrados = null;
-        List<String> camposDeseados = Arrays.asList("codigo_sucursal", "Cliente");
+        List<String> camposDeseados = Arrays.asList("linea", "Cliente");
         for (String sheetName : sheetNames) {
             System.out.println("Contenido de la hoja: " + sheetName);
             headers = obtenerEncabezados(okCarteraFile, sheetName);
@@ -946,7 +937,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 }
                 System.out.println();
             }
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1009,8 +1000,6 @@ public class HistoricoCarteraMicrocreditoPorOF {
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin);
 
-            // Especifica los campos que deseas obtener
-            //List<String> camposDeseados = Arrays.asList("codigo_sucursal", "re_est");
 
             // Imprimir datos filtrados
             System.out.println("Datos filtrados por " + campoFiltrar + " en el rango [" + valorInicio + ", " + valorFin + "]");
@@ -1058,7 +1047,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 }
                 System.out.println();
             }
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1176,7 +1165,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1293,7 +1282,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 }
                 System.out.println();
             }
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1411,7 +1400,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1531,7 +1520,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1653,7 +1642,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1772,7 +1761,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1895,7 +1884,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -2018,7 +2007,7 @@ public class HistoricoCarteraMicrocreditoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 

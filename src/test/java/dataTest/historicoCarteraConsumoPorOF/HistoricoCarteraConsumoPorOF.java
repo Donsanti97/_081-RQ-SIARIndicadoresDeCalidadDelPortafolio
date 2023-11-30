@@ -1,10 +1,8 @@
 package dataTest.historicoCarteraConsumoPorOF;
 
 import org.apache.poi.util.IOUtils;
-import org.testng.annotations.Test;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,17 +11,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static dataTest.MethotsAzureMasterFiles.*;
 import static dataTest.FunctionsApachePoi.*;
-import static org.utils.MethotsAzureMasterFiles.getDirecotry;
-import static org.utils.MethotsAzureMasterFiles.getDocument;
 
 public class HistoricoCarteraConsumoPorOF {
     //34 Hojas
-    public static void deleteTempFile() {
-        eliminarExcel(System.getProperty("user.home") + File.separator + "Documentos\\TemporalFile.xlsx", 5);
+    public static void deleteTempFile(String tempFile) {
+        eliminarExcel(tempFile, 5);
     }
 
-    @Test
     public static void configuracion(String masterFile) {
 
         JOptionPane.showMessageDialog(null, "Seleccione el archivo Azure");
@@ -38,7 +34,7 @@ public class HistoricoCarteraConsumoPorOF {
         String fechaCorte = mostrarCuadroDeTexto();
         JOptionPane.showMessageDialog(null, "A continuación se creará un archivo temporal " +
                 "\n Se recomienda seleccionar la carpeta \"Documentos\" para esta función...");
-        String tempFile = getDirecotry() + "\\TemporalFile.xlsx";
+        String tempFile = getDirectory() + "\\TemporalFile.xlsx";
 
 
 
@@ -48,7 +44,7 @@ public class HistoricoCarteraConsumoPorOF {
             System.out.println("Espere el proceso de análisis va a comenzar...");
             waitSeconds(5);
 
-            JOptionPane.showMessageDialog(null, "Espere un momento el análisis puede ser demorado...");
+            System.out.println("Espere un momento el análisis puede ser demorado...");
             waitMinutes(5);
 
             carteraBruta(okCartera, masterFile, azureFile, fechaCorte, "Cartera Bruta", tempFile);
@@ -171,12 +167,12 @@ public class HistoricoCarteraConsumoPorOF {
             JOptionPane.showMessageDialog(null, "Archivos analizados correctamente...");
             waitSeconds(10);
 
-
+            deleteTempFile(tempFile);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        deleteTempFile();
+
 
     }
 
@@ -203,8 +199,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin);
@@ -222,6 +218,7 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
+            waitSeconds(10);
             runtime();
 
             System.out.println("----------------------");
@@ -232,6 +229,7 @@ public class HistoricoCarteraConsumoPorOF {
         crearNuevaHojaExcel(tempFile, camposDeseados, datosFiltrados);
 
         System.out.println("Analisis archivo temporal----------------------");
+        System.out.println("Por favor espere el proceso sigue en análisis");
 
         sheetNames = obtenerNombresDeHojas(tempFile);
 
@@ -258,8 +256,10 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
+            runtime();
+            waitSeconds(2);
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -288,6 +288,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             }
             runtime();
+            waitSeconds(2);
 
         }
     }
@@ -317,8 +318,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             //int rangoDesde = 361;
             //int rangoHasta = 5000L;
 
@@ -339,6 +340,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
             runtime();
+            waitSeconds(2);
 
             System.out.println("----------------------");
         }
@@ -374,8 +376,10 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
+            runtime();
+            waitSeconds(2);
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -404,6 +408,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             }
             runtime();
+            waitSeconds(2);
         }
     }
 
@@ -432,8 +437,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin, campoCalificacion, calificacion, calificacion);
@@ -452,6 +457,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
             runtime();
+            waitSeconds(2);
 
             System.out.println("----------------------");
         }
@@ -487,8 +493,10 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
+            runtime();
+            waitSeconds(2);
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -517,6 +525,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             }
             runtime();
+            waitSeconds(2);
 
         }
     }
@@ -547,8 +556,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin, reEstCapital, 1, 1);
@@ -567,6 +576,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
             runtime();
+            waitSeconds(2);
 
             System.out.println("----------------------");
         }
@@ -602,8 +612,10 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
+            runtime();
+            waitSeconds(2);
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -626,6 +638,8 @@ public class HistoricoCarteraConsumoPorOF {
 
                             }
                         }
+                        waitSeconds(5);
+                        runtime();
                         /*-------------------------------------------------------------------*/
                     }
                 }
@@ -659,11 +673,13 @@ public class HistoricoCarteraConsumoPorOF {
             for (String header : headers) {
                 System.out.println(header);
             }
+            runtime();
+            waitSeconds(2);
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin);
@@ -684,6 +700,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
             runtime();
+            waitSeconds(2);
 
             System.out.println("----------------------");
         }
@@ -720,7 +737,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -777,8 +794,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin);
@@ -833,7 +850,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -890,8 +907,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin);
@@ -945,7 +962,7 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1002,8 +1019,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
 
             // Filtrar los datos por el campo y el rango especificados
             datosFiltrados = obtenerValoresDeEncabezados(okCarteraFile, sheetName, campoFiltrar, valorInicio, valorFin);
@@ -1057,7 +1074,7 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1114,8 +1131,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1175,7 +1192,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1232,8 +1249,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1292,7 +1309,7 @@ public class HistoricoCarteraConsumoPorOF {
                 }
                 System.out.println();
             }
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1349,8 +1366,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1410,7 +1427,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1467,8 +1484,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1530,7 +1547,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1589,8 +1606,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1652,7 +1669,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1711,8 +1728,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1771,7 +1788,7 @@ public class HistoricoCarteraConsumoPorOF {
                 System.out.println();
             }
 
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1));
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1831,8 +1848,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -1894,7 +1911,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 50);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 
@@ -1954,8 +1971,8 @@ public class HistoricoCarteraConsumoPorOF {
 
             // Especifica el campo en el que deseas aplicar el filtro
             String campoFiltrar = "modalidad";
-            String valorInicio = "CONCUMO"; // Reemplaza con el valor de inicio del rango
-            String valorFin = "CONCUMO"; // Reemplaza con el valor de fin del rango
+            String valorInicio = "CONSUMO"; // Reemplaza con el valor de inicio del rango
+            String valorFin = "CONSUMO"; // Reemplaza con el valor de fin del rango
             String fechaInicio = "01/" + mesAnoCorte;
             String fechafin = "31/" + mesAnoCorte;
             Date rangoInicio = new SimpleDateFormat("dd/MM/yyyy").parse(fechaInicio);
@@ -2017,7 +2034,7 @@ public class HistoricoCarteraConsumoPorOF {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " + camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 

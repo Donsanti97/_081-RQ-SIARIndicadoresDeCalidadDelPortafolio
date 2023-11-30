@@ -1,15 +1,13 @@
 package dataTest;
 
-import dataTest.historicoCarteraComercialPorOF.HistoricoCarteraComercialPorOF;
-import dataTest.historicoCarteraConsumoPorOF.HistoricoCarteraConsumoPorOF;
-import dataTest.historicoCarteraMicrocreditoPorOF.HistoricoCarteraMicrocreditoPorOF;
+import dataTest.historicoCarteraSegMonto_ColocPorOF.*;
 import org.testng.annotations.Test;
 
 import javax.swing.*;
 
 import java.io.File;
 
-import static org.utils.MethotsAzureMasterFiles.getDocument;
+import static dataTest.MethotsAzureMasterFiles.getDocument;
 
 public class Start {
     @Test
@@ -23,12 +21,8 @@ public class Start {
             System.out.println(file.getName());
             String fileName = file.getName().toLowerCase();
             System.out.println(fileName);
-            if (fileName.contains("comercial")){
-                HistoricoCarteraComercialPorOF.configuracion(masterFile);
-            } else if (fileName.contains("consumo")) {
-                HistoricoCarteraConsumoPorOF.configuracion(masterFile);
-            } else if (fileName.contains("microcredito")) {
-                HistoricoCarteraMicrocreditoPorOF.configuracion(masterFile);
+            if (fileName.contains("historico cartera seg monto_coloc por of")){
+                HistoricoCarteraSegMonto_ColocPorOF.configuracion(masterFile);
             }else {
                 System.out.println("EL ARCHIVO SELECCIONADO NO TIENE ANÁLISIS ASIGNADO");
             }

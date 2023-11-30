@@ -18,8 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static dataTest.FunctionsApachePoi.*;
-import static org.utils.MethotsAzureMasterFiles.getDirecotry;
-import static org.utils.MethotsAzureMasterFiles.getDocument;
+import static dataTest.MethotsAzureMasterFiles.*;
 
 
 public class NumericValues {
@@ -66,7 +65,7 @@ public class NumericValues {
         String fechaCorte = mostrarCuadroDeTexto();
         JOptionPane.showMessageDialog(null, "A continuación se creará un archivo temporal " +
                 "\n Se recomienda seleccionar la carpeta \"Documentos\" para esta función...");
-        String tempFile = getDirecotry() + "\\TemporalFile.xlsx";
+        String tempFile = getDirectory() + "\\TemporalFile.xlsx";
 
         JOptionPane.showMessageDialog(null, "Espere un momento la última hoja está siendo analizada...");
         waitMinutes(5);
@@ -98,7 +97,7 @@ public class NumericValues {
         String fechaCorte = mostrarCuadroDeTexto();
 
         List<Map<String, String>> getdata = null/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
-        getdata = obtenerValoresEncabezados2(azureFile, masterFile, "Comercial_Pzo_Perc_0.8", fechaCorte);
+        getdata = obtenerValoresEncabezados2(azureFile, masterFile, "Cartera Total", fechaCorte);
         for (Map<String, String> data : getdata){
             for (Map.Entry<String, String> entry : data.entrySet()){
                 System.out.println("KEY: " + entry.getKey() + ", VALUE: " + entry.getValue());
@@ -202,7 +201,7 @@ public class NumericValues {
 
             System.out.println("AQUÍ COMIENZA SUMA DE CAMPOS");
             System.out.println(camposDeseados.get(0) + ": " +camposDeseados.get(1));
-            Map<String, String> resultado = calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
+            Map<String, String> resultado = functions.calcularSumaPorValoresUnicos(tempFile, camposDeseados.get(0), camposDeseados.get(1), 80);
 
             List<Map<String, String>> datosMasterFile = obtenerValoresEncabezados2(azureFile, masterFile, hoja, fechaCorte)/*getHeadersMFile(azureFile, masterFile, fechaCorte)*/;
 

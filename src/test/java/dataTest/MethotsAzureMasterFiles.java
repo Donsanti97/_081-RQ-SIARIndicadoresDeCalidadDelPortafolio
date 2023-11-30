@@ -12,7 +12,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -65,6 +64,29 @@ public class MethotsAzureMasterFiles {
         }
     }
 
+    public static String getDirectory() {
+        // Crea un objeto JFileChooser
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Configura el directorio inicial en la carpeta de documentos del usuario
+        String rutaDocumentos = System.getProperty("user.home")/* + File.separator + "Documentos"*/;
+        fileChooser.setCurrentDirectory(new File(rutaDocumentos));
+
+        // Filtra para mostrar solo archivos de Excel
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        // Muestra el diálogo de selección de archivo
+        int resultado = fileChooser.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+            String rutaCompleta = archivoSeleccionado.getAbsolutePath();
+            return rutaCompleta;
+        } else {
+            return null; // Si no se seleccionó ningún archivo, retorna null
+        }
+    }
+
     /*-------------------------------------------------------------------------------------------------------------------------------*/
     public static int findSheetIndexInExcelB(String excelAFilePath, String excelBFilePath, String targetSheetName) throws IOException {
         FileInputStream excelAFile = new FileInputStream(excelAFilePath);
@@ -101,7 +123,7 @@ public class MethotsAzureMasterFiles {
 
     public static void runtime() {
         Runtime runtime = Runtime.getRuntime();
-        long minRunningMemory = (1024 * 1024);
+        long minRunningMemory = (8L * 1024L * 1024L * 1024L);
         if (runtime.freeMemory() < minRunningMemory) {
             System.gc();
         }
@@ -233,7 +255,7 @@ public class MethotsAzureMasterFiles {
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Cell cell = row.getCell(columnaBuscada);
-            String valorCelda = obtenerValorCelda(cell);
+            String valorCelda = obtenerValorVisibleCelda(cell);
 
             if (valorBuscado.equals(valorCelda)) {
                 return obtenerValoresFila(row);
@@ -248,6 +270,8 @@ public class MethotsAzureMasterFiles {
         String headerFirstFile1 = headers1.get(0);
         List<String> headers2 = getHeaders(sheet2);
         String headerSecondFile = headers2.get(0);
+        /*JOptionPane.showMessageDialog(null, "Seleccione el PRIMER encabezado en el archivo Maestro de la hoja [" + sheet2.getSheetName() + "]");
+        String seleccion2 = FunctionsApachePoi.mostrarMenu(headers1);*/
 
         if (!headerFirstFile1.equals(headerSecondFile)) {
             headers2 = findValueInColumn(sheet1, 0, headers1.get(0));
@@ -333,15 +357,30 @@ public class MethotsAzureMasterFiles {
                     if (DateUtil.isCellDateFormatted(cell)) {
                         valor = dataFormatter.formatCellValue(cell);
                     } else {
-                        valor = dataFormatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString());
+                        double numericValue = cell.getNumericCellValue();
+                        String dataFormatString = cell.getCellStyle().getDataFormatString();
+
+                        if (numericValue >= -99.99 && numericValue <= 99.99) {
+                            if (numericValue == 0){
+                                valor = dataFormatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString());
+
+                            }else {
+                                valor = String.format("%.2f%%", numericValue * 100);
+                            }
+                        }else {
+                            valor = dataFormatter.formatRawCellContents(cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(), cell.getCellStyle().getDataFormatString());
+                        }
                     }
                     break;
                 case BOOLEAN:
                     valor = Boolean.toString(cell.getBooleanCellValue());
                     break;
                 case BLANK:
-                    valor = "";
+                case _NONE:
+                case ERROR:
+                    valor = "0.00";
                     break;
+
                 default:
                     valor = dataFormatter.formatCellValue(cell);
             }
@@ -454,9 +493,16 @@ public class MethotsAzureMasterFiles {
             List<String> valoresFila = obtenerValoresFila(row);
 
             Map<String, String> fila = new HashMap<>();
+
             try {
-                fila.put(header1, valoresFila.get(indexHeader1));
-                fila.put(header2, valoresFila.get(indexHeader2));
+                if (indexHeader1 >= 0 && indexHeader1 < valoresFila.size() &&
+                        indexHeader2 >= 0 && indexHeader2 < valoresFila.size()) {
+                    fila.put(header1, valoresFila.get(indexHeader1));
+                    fila.put(header2, valoresFila.get(indexHeader2));
+                } else {
+                    System.err.println("En la fila [" + row.getRowNum() + "] no se encuentran los datos completos. " +
+                            "\n Por favor rellene con [0] o con [NA] según el campo que falte numérico o caracteres respectivamente");
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -580,8 +626,8 @@ public class MethotsAzureMasterFiles {
 
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            String codCiudad = obtenerValorCelda(row.getCell(columnaCodCiudad));
-            String valorFecha = obtenerValorCelda(row.getCell(columnaFecha));
+            String codCiudad = obtenerValorVisibleCelda(row.getCell(columnaCodCiudad));
+            String valorFecha = obtenerValorVisibleCelda(row.getCell(columnaFecha));
             valoresPorCodCiudad.put(codCiudad, valorFecha);
         }
 
